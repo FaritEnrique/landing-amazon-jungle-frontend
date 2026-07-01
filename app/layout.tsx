@@ -1,24 +1,38 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Great_Vibes } from "next/font/google";
+import {
+  Geist_Mono,
+  Great_Vibes,
+  Montserrat,
+  Playfair_Display,
+} from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AppToaster from "./components/AppToaster";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const greatVibes = Great_Vibes({
   weight: "400",
   variable: "--font-great-vibes",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -30,7 +44,6 @@ export const viewport: Viewport = {
   themeColor: "#1e3a8a",
 };
 
-// 💡 Convertido a Arrow Function para respetar el estándar estricto del proyecto
 const RootLayout = ({
   children,
 }: Readonly<{
@@ -39,20 +52,15 @@ const RootLayout = ({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${playfair.variable} ${greatVibes.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className={`${greatVibes.className} min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden`}>
-        {/* Header institucional */}
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden font-sans">
         <Header />
 
         <AppToaster />
 
-        {/* Contenedor dinámico para las páginas del sistema */}
-        <main className="flex-grow w-full">
-          {children}
-        </main>
+        <main className="grow w-full">{children}</main>
 
-        {/* Footer de auditoría */}
         <Footer />
       </body>
     </html>

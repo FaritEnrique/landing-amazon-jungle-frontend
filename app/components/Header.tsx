@@ -110,13 +110,13 @@ const Header = () => {
           : "";
 
   return (
-    <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm relative transition-colors duration-300">
+    <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 flex items-center justify-between gap-3 sm:gap-4">
         <Link
           href="/"
           className="flex items-center space-x-2.5 sm:space-x-4 group min-w-0"
         >
-          <div className="relative w-10 h-12 sm:w-14 sm:h-16 flex-shrink-0 transition-transform group-hover:scale-105 duration-200">
+          <div className="relative w-10 h-12 sm:w-14 sm:h-16 shrink-0 transition-transform group-hover:scale-105 duration-200">
             <Image
               src="/images/logos/logo-sbg.webp"
               alt="Turismo / Amazon Jugle Expedition"
@@ -140,7 +140,7 @@ const Header = () => {
           </div>
         </Link>
 
-        <div className="flex items-center space-x-1.5 sm:space-x-4 flex-shrink-0">
+        <div className="flex items-center space-x-1.5 sm:space-x-4 shrink-0">
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
             type="button"
@@ -184,14 +184,14 @@ const Header = () => {
             </div>
           ) : user ? (
             <div className="hidden md:flex items-center space-x-2 sm:space-x-3 bg-blue-50/80 dark:bg-slate-800 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-blue-100 dark:border-slate-700">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
 
               <div className="text-left hidden sm:block">
                 <span className="text-[9px] text-slate-500 dark:text-slate-400 block font-bold uppercase tracking-wider">
                   Rol Activo
                 </span>
 
-                <span className="text-xs font-black text-blue-900 dark:text-sky-400 tracking-wide block truncate max-w-[140px] lg:max-w-[180px]">
+                <span className="text-xs font-black text-blue-900 dark:text-sky-400 tracking-wide block truncate max-w-[140px] lg:max-w-40">
                   {roleLabel}
                 </span>
               </div>
@@ -249,7 +249,7 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="hidden md:block bg-gradient-to-r from-blue-900 via-blue-800 to-sky-950 dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 text-white border-t dark:border-slate-800">
+      <div className="hidden md:block bg-linear-to-r from-blue-900 via-blue-800 to-sky-950 dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 text-white border-t dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-11 flex items-center justify-between text-xs font-semibold">
           <nav className="flex space-x-6">
             <Link

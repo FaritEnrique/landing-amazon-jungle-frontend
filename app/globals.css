@@ -1,52 +1,50 @@
 @import "tailwindcss";
 
-/* 1. Declarar el selector manual para que Tailwind active las clases dark: mediante .dark */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* 2. Definición del tema y variables usando la sintaxis nativa de Tailwind v4 */
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-sans: var(--font-montserrat), Arial, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
   --font-dolphin: var(--font-great-vibes), cursive;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-/* 3. Variables de entorno globales del sistema */
 :root {
-  --background: #f8fafc; /* slate-50 (Modo Claro Institucional) */
-  --foreground: #0f172a; /* slate-900 */
+  --background: #f8fafc;
+  --foreground: #0f172a;
 
-  /* Transición fluida global para el cambio de luces */
   transition:
     background-color 300ms ease-in-out,
     color 300ms ease-in-out,
     border-color 300ms ease-in-out;
 }
 
-/* 4. Interruptor reactivo: Cuando se inyecta la clase .dark al <html> */
 html.dark {
-  --background: #020617; /* slate-950 (Modo Oscuro Mate) */
-  --foreground: #f1f5f9; /* slate-100 */
+  --background: #020617;
+  --foreground: #f1f5f9;
 }
 
-/* 5. Estilos base del chasis */
 html {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--font-montserrat), Arial, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: inherit;
+  font-family: var(--font-montserrat), Arial, sans-serif;
 }
 
-/* Animación de entrada para interfaces y menús desplegables */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
               Contact
             </h3>
             <div className="flex items-center justify-center gap-2 mt-4 text-sm font-light text-zinc-200">
-              <FaWhatsapp className="text-base flex-shrink-0" />
+              <FaWhatsapp className="text-base shrink-0" />
               <span>+51 943214093 / 963736321</span>
             </div>
           </div>
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
               Find us
             </h3>
             <div className="flex items-center justify-center gap-2 mt-4 text-sm font-light text-zinc-200">
-              <FaMapMarkerAlt className="text-base flex-shrink-0" />
+              <FaMapMarkerAlt className="text-base shrink-0" />
               <span>Pasaje Sargento Tejada #152 Iquitos</span>
             </div>
           </div>
@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
               Write to us
             </h3>
             <div className="flex items-center justify-center gap-2 mt-4 text-sm font-light text-zinc-200">
-              <FaRegEnvelope className="text-base flex-shrink-0" />
+              <FaRegEnvelope className="text-base shrink-0" />
               <a href="mailto:reservas@amazonjungle-expeditions.com" className="hover:underline break-all">
                 reservas@amazonjungle-expeditions.com
               </a>
