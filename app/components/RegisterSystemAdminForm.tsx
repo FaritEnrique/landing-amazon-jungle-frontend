@@ -1,13 +1,14 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { bootstrapSystemAdmin } from "@/lib/authApi";
 import { toast } from "sonner";
 
-const SESSION_HINT_KEY = "sgp_nss_session_hint";
+const SESSION_HINT_KEY = "landing_amazon_jungle_session_hint";
 
 const RegisterSystemAdminForm = ({
-  onRegistryComplete
+  onRegistryComplete,
 }: {
   onRegistryComplete: () => void;
 }) => {
@@ -18,11 +19,13 @@ const RegisterSystemAdminForm = ({
     roleName: "ADMINISTRADOR_SISTEMA",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +61,7 @@ const RegisterSystemAdminForm = ({
         area: formData.area,
         email: formData.email,
         password: formData.password,
-        confirmPassword: formData.confirmPassword
+        confirmPassword: formData.confirmPassword,
       });
 
       window.localStorage.setItem(SESSION_HINT_KEY, "1");
@@ -84,13 +87,13 @@ const RegisterSystemAdminForm = ({
           🛡️ Inicialización de Infraestructura
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-black text-blue-900 dark:text-sky-400 tracking-tight uppercase break-words">
+        <h2 className="text-xl sm:text-2xl font-black text-blue-900 dark:text-sky-400 tracking-tight uppercase wrap-break-word">
           ADMINISTRADOR_SISTEMA
         </h2>
 
         <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-          Base de datos vacía. El primer registro configurará la cuenta raíz con el rol técnico de{" "}
-          <strong>ADMINISTRADOR_SISTEMA</strong>.
+          Base de datos vacía. El primer registro configurará la cuenta raíz con
+          el rol técnico de <strong>ADMINISTRADOR_SISTEMA</strong>.
         </p>
       </div>
 
@@ -208,15 +211,17 @@ const RegisterSystemAdminForm = ({
             type="email"
             required
             autoComplete="username"
-            placeholder="ti@cepsnss.edu.pe"
+            placeholder="tucorreo@example.com"
             className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-blue-900 dark:focus:border-sky-500 text-slate-900 dark:text-slate-100 transition-colors"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             disabled={isSubmitting}
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <label
               htmlFor="bootstrap-password"
@@ -225,20 +230,34 @@ const RegisterSystemAdminForm = ({
               Contraseña
             </label>
 
-            <input
-              id="bootstrap-password"
-              name="password"
-              type="password"
-              required
-              autoComplete="new-password"
-              placeholder="••••••••"
-              className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-blue-900 dark:focus:border-sky-500 text-slate-900 dark:text-slate-100 transition-colors"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              disabled={isSubmitting}
-            />
+            <div className="relative">
+              <input
+                id="bootstrap-password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                autoComplete="new-password"
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pr-10 text-xs text-slate-900 transition-colors focus:border-blue-900 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-sky-500"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                disabled={isSubmitting}
+              />
+
+              <button
+                type="button"
+                aria-label={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
+                onClick={() => setShowPassword((current) => !current)}
+                disabled={isSubmitting}
+                className="absolute inset-y-0 right-3 grid place-items-center text-slate-400 transition hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-slate-200"
+              >
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -249,27 +268,46 @@ const RegisterSystemAdminForm = ({
               Confirmar Contraseña
             </label>
 
-            <input
-              id="bootstrap-confirm-password"
-              name="confirmPassword"
-              type="password"
-              required
-              autoComplete="new-password"
-              placeholder="••••••••"
-              className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-blue-900 dark:focus:border-sky-500 text-slate-900 dark:text-slate-100 transition-colors"
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData({ ...formData, confirmPassword: e.target.value })
-              }
-              disabled={isSubmitting}
-            />
+            <div className="relative">
+              <input
+                id="bootstrap-confirm-password"
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                autoComplete="new-password"
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pr-10 text-xs text-slate-900 transition-colors focus:border-blue-900 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-sky-500"
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                disabled={isSubmitting}
+              />
+
+              <button
+                type="button"
+                aria-label={
+                  showConfirmPassword
+                    ? "Ocultar confirmación de contraseña"
+                    : "Mostrar confirmación de contraseña"
+                }
+                onClick={() => setShowConfirmPassword((current) => !current)}
+                disabled={isSubmitting}
+                className="absolute inset-y-0 right-3 grid place-items-center text-slate-400 transition hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-slate-200"
+              >
+                {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
           </div>
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full mt-2 py-3 bg-amber-600 hover:bg-amber-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition-colors duration-200"
+          className="mt-2 w-full rounded-xl bg-amber-600 py-3 text-xs font-black uppercase tracking-wider text-white shadow-md transition-colors duration-200 hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting
             ? "Configurando cuenta raíz..."

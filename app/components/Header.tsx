@@ -2,114 +2,233 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ChevronDown,
-  Menu,
-  Phone,
-  Search,
-  ShoppingCart,
-  X,
-} from "lucide-react";
+import { Menu, Phone, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { FaInstagram, FaYoutube } from "react-icons/fa";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 
 const Header = () => {
+  const pathname = usePathname();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  const isHomePage = pathname === "/";
+  const isOverlayHeader = isHomePage && !hasScrolled && !isMenuOpen;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHasScrolled(window.scrollY > 40);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 w-full font-sans">
-      {/* Barra superior */}
-      <div className="hidden border-b border-emerald-800/40 bg-emerald-950 text-white lg:block">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2 text-xs font-medium">
-          <div className="flex items-center gap-4">
-            <Link
-              href="https://www.instagram.com/aldofloreshidalgo123"
-              target="_blank"
-              className="flex items-center gap-1 text-white/80 transition hover:text-emerald-300"
-            >
-              <FaInstagram size={15} />
-              Instagram
-            </Link>
-
-            <Link
-              href="https://www.youtube.com/@amazonjungleexpeditionsloge?si=QlHVPIcGII2zoxe7"
-              target="_blank"
-              className="flex items-center gap-1 text-white/80 transition hover:text-emerald-300"
-            >
-              <FaYoutube size={16} />
-              YouTube
-            </Link>
-          </div>
-
-          <Link
-            href="https://wa.me/51943214093"
-            target="_blank"
-            className="flex items-center gap-2 tracking-wide text-emerald-100 transition hover:text-white"
-          >
-            <Phone size={15} />
-            RESERVAR (+51) 943214093 / 937069135 / 963736321
-          </Link>
-        </div>
-      </div>
-
-      {/* Header principal */}
-      <div className="border-b border-emerald-900/10 bg-white/95 shadow-sm backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:py-4">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-12 w-12 overflow-hidden rounded-full bg-emerald-950 shadow-md ring-2 ring-emerald-700/20 lg:h-14 lg:w-14">
-              <Image
-                src="/images/logos/Logo-sbg.webp"
-                alt="Amazon Jungle Expeditions"
-                fill
-                sizes="56px"
-                className="object-contain p-1"
-                priority
-              />
-            </div>
-
-            <div className="leading-tight">
-              <p className="font-display text-lg font-bold text-emerald-950 sm:text-xl">
-                Amazon Jungle
-              </p>
-              <p className="font-display text-lg font-bold text-emerald-950 sm:text-xl">
-                Expeditions
-              </p>
-            </div>
-          </Link>
-
-          {/* Acciones desktop */}
-          <div className="hidden items-center gap-3 lg:flex">
+    <>
+      <header className="fixed left-0 top-0 z-50 w-full font-sans">
+        {/* Barra superior */}
+        <div
+          className={[
+            "hidden border-b text-white transition-all duration-300 lg:block",
+            isOverlayHeader
+              ? "border-lime-800/30 bg-lime-700/95"
+              : "border-emerald-900/20 bg-emerald-950",
+          ].join(" ")}
+        >
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2 text-xs font-bold">
             <Link
               href="https://wa.me/51943214093"
               target="_blank"
-              className="rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-900/15 transition hover:bg-emerald-800"
+              rel="noreferrer"
+              className="flex items-center gap-2 tracking-wide text-emerald-50 transition hover:text-white"
             >
-              Intranet
+              <Phone size={15} />
+              RESERVAR (+51) 943214093 / 937069135 / 963736321
             </Link>
-          </div>
 
-          {/* Botón móvil */}
-          <button
-            type="button"
-            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-            onClick={() => setIsMenuOpen((current) => !current)}
-            className="grid h-11 w-11 place-items-center rounded-full border border-slate-200 text-slate-800 lg:hidden"
-          >
-            {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+            <div className="flex items-center gap-4">
+              <Link
+                href="https://www.instagram.com/aldofloreshidalgo123"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+                className="flex items-center gap-1 text-white/90 transition hover:text-white"
+              >
+                <FaInstagram size={16} />
+                <span>Instagram</span>
+              </Link>
+
+              <Link
+                href="https://www.youtube.com/@amazonjungleexpeditionsloge?si=QlHVPIcGII2zoxe7"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="YouTube"
+                className="flex items-center gap-1 text-white/90 transition hover:text-white"
+              >
+                <FaYoutube size={17} />
+                <span>YouTube</span>
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {/* Menú móvil */}
-        {isMenuOpen && (
-          <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-xl lg:hidden">
-            <nav className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
-              
-            </nav>
+        {/* Header principal */}
+        <div
+          className={[
+            "transition-all duration-300",
+            isOverlayHeader
+              ? "border-transparent bg-transparent text-white"
+              : "border-b border-emerald-900/10 bg-white/95 text-slate-900 shadow-sm backdrop-blur-xl",
+          ].join(" ")}
+        >
+          <div
+            className={[
+              "mx-auto flex max-w-7xl items-center justify-between px-4 transition-all duration-300 sm:px-6",
+              isOverlayHeader ? "py-4 lg:py-5" : "py-3 lg:py-4",
+            ].join(" ")}
+          >
+            <Link
+              href="https://www.amazonjungle-expeditions.com/"
+              className="flex items-center gap-3"
+            >
+              <div
+                className={[
+                  "relative overflow-hidden rounded-full transition-all duration-300",
+                  isOverlayHeader
+                    ? "h-14 w-14 bg-white/10 ring-2 ring-white/40 lg:h-20 lg:w-20"
+                    : "h-12 w-12 bg-emerald-950 shadow-md ring-2 ring-emerald-700/20 lg:h-14 lg:w-14",
+                ].join(" ")}
+              >
+                <Image
+                  src="/images/logos/Logo-sbg.webp"
+                  alt="Amazon Jungle Expeditions"
+                  fill
+                  sizes="(max-width: 1024px) 56px, 80px"
+                  className="object-contain p-1"
+                  priority
+                />
+              </div>
+
+              <div className="leading-tight">
+                <p
+                  className={[
+                    "font-display text-lg font-bold transition-colors sm:text-xl",
+                    isOverlayHeader
+                      ? "text-white drop-shadow"
+                      : "text-emerald-950",
+                  ].join(" ")}
+                >
+                  Amazon Jungle
+                </p>
+
+                <p
+                  className={[
+                    "font-display text-lg font-bold transition-colors sm:text-xl",
+                    isOverlayHeader
+                      ? "text-white drop-shadow"
+                      : "text-emerald-950",
+                  ].join(" ")}
+                >
+                  Expeditions
+                </p>
+              </div>
+            </Link>
+
+            {/* Acción desktop */}
+            <div className="hidden items-center gap-3 lg:flex">
+              <Link
+                href="/login"
+                className={[
+                  "rounded-full px-5 py-2.5 text-sm font-black uppercase tracking-wide shadow-lg transition",
+                  isOverlayHeader
+                    ? "bg-white text-emerald-900 shadow-black/20 hover:bg-emerald-50"
+                    : "bg-emerald-700 text-white shadow-emerald-900/15 hover:bg-emerald-800",
+                ].join(" ")}
+              >
+                Intranet
+              </Link>
+            </div>
+
+            {/* Botón móvil */}
+            <button
+              type="button"
+              aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+              onClick={() => setIsMenuOpen((current) => !current)}
+              className={[
+                "grid h-11 w-11 place-items-center rounded-full border transition lg:hidden",
+                isOverlayHeader
+                  ? "border-white/40 bg-black/10 text-white backdrop-blur-md"
+                  : "border-slate-200 bg-white text-slate-800",
+              ].join(" ")}
+            >
+              {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
-        )}
-      </div>
-    </header>
+
+          {/* Menú móvil */}
+          {isMenuOpen && (
+            <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-xl lg:hidden">
+              <nav className="flex flex-col gap-1 text-sm font-bold text-slate-700">
+                <Link
+                  href="https://wa.me/51943214093"
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="rounded-xl px-4 py-3 text-emerald-700 transition hover:bg-emerald-50"
+                >
+                  Reservar por WhatsApp
+                </Link>
+
+                <Link
+                  href="https://www.instagram.com/aldofloreshidalgo123"
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-2 rounded-xl px-4 py-3 transition hover:bg-emerald-50 hover:text-emerald-700"
+                >
+                  <FaInstagram size={16} />
+                  Instagram
+                </Link>
+
+                <Link
+                  href="https://www.youtube.com/@amazonjungleexpeditionsloge?si=QlHVPIcGII2zoxe7"
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-2 rounded-xl px-4 py-3 transition hover:bg-emerald-50 hover:text-emerald-700"
+                >
+                  <FaYoutube size={17} />
+                  YouTube
+                </Link>
+
+                <Link
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="mt-3 rounded-full bg-emerald-700 px-5 py-3 text-center font-black uppercase tracking-wide text-white transition hover:bg-emerald-800"
+                >
+                  Intranet
+                </Link>
+              </nav>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {!isHomePage && (
+        <div className="h-[76px] lg:h-[118px]" aria-hidden="true" />
+      )}
+    </>
   );
 };
 

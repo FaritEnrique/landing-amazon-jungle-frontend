@@ -1,6 +1,6 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-export type AuthRole = "ADMINISTRADOR_SISTEMA" | "ADMINISTRADOR" | "OPERADOR";
+export type AuthRole = "ADMINISTRADOR_SISTEMA" | "OPERADOR";
 
 export interface AuthUser {
   id: string;
