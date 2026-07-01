@@ -56,12 +56,12 @@ const DashboardPage = () => {
           Sesión activa
         </div>
 
-        <h1 className="mt-4 text-2xl font-black text-blue-900 dark:text-sky-400 uppercase tracking-tight">
+        <h1 className="mt-4 text-2xl font-black text-emerald-900 dark:text-emerald-400 uppercase tracking-tight">
           Dashboard
         </h1>
 
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Sesión iniciada correctamente en el SGP-CEPS NSS.
+          Sesión iniciada correctamente en el Amazon Jungle Expeditions.
         </p>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -91,6 +91,23 @@ const DashboardPage = () => {
               {user.area}
             </p>
           </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/30">
+          <h2 className="text-sm font-black uppercase tracking-tight text-emerald-950 dark:text-emerald-400">
+            SEO de la landing
+          </h2>
+
+          <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+            Administra las palabras y frases clave que alimentan la metadata pública de Amazon Jungle Expeditions.
+          </p>
+
+          <a
+            href="/dashboard/seo"
+            className="mt-4 inline-flex rounded-xl bg-emerald-800 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900"
+          >
+            Gestionar palabras clave
+          </a>
         </div>
       </div>
     </div>
