@@ -93,7 +93,7 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/30">
             <h2 className="text-sm font-black uppercase tracking-tight text-emerald-950 dark:text-emerald-400">
               SEO de la landing
@@ -125,6 +125,23 @@ const DashboardPage = () => {
               className="mt-4 inline-flex rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-950 transition hover:bg-amber-400"
             >
               Gestionar carrusel
+            </a>
+          </div>
+
+          <div className="rounded-2xl border border-lime-100 bg-lime-50 p-4 dark:border-lime-900/40 dark:bg-lime-950/20">
+            <h2 className="text-sm font-black uppercase tracking-tight text-lime-950 dark:text-lime-300">
+              Paquetes turísticos
+            </h2>
+
+            <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+              Administra las imágenes WebP, textos sobre fotografía, precios y contenido inferior de los tours.
+            </p>
+
+            <a
+              href="/dashboard/tour-packages"
+              className="mt-4 inline-flex rounded-xl bg-lime-600 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-lime-700"
+            >
+              Gestionar paquetes
             </a>
           </div>
         </div>

@@ -1,10 +1,12 @@
 import type { TourPackage } from "@/app/components/tours/tourPackageTypes";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface ApiResponse<T> {
+  ok?: boolean;
   data: T;
   message?: string;
+  error?: string;
   errors?: string[];
 }
 
@@ -17,9 +19,9 @@ export interface TourPackagePayload {
   imageFile?: File | null;
 
   bottomTitle: string;
-  bottomDescription?: string;
-  buttonLabel?: string;
-  buttonHref?: string;
+  bottomDescription?: string | null;
+  buttonLabel?: string | null;
+  buttonHref?: string | null;
 
   active: boolean;
   sortOrder: number;
@@ -31,7 +33,6 @@ const buildFormData = (payload: TourPackagePayload) => {
   formData.append("duration", payload.duration);
   formData.append("overlayTitle", payload.overlayTitle);
   formData.append("price", payload.price);
-
   formData.append("imageAlt", payload.imageAlt || "");
 
   formData.append("bottomTitle", payload.bottomTitle);
@@ -57,16 +58,34 @@ const getErrorMessage = async (response: Response, fallback: string) => {
       return result.errors.join(" ");
     }
 
-    return result.message || fallback;
+    return result.error || result.message || fallback;
   } catch {
     return fallback;
   }
+};
+
+export const resolveTourPackageImageUrl = (imageUrl: string) => {
+  if (!imageUrl) {
+    return "";
+  }
+
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+
+  if (imageUrl.startsWith("/uploads/")) {
+    return `${API_URL}${imageUrl}`;
+  }
+
+  return imageUrl;
 };
 
 export const listarTourPackages = async (includeInactive = false) => {
   const response = await fetch(
     `${API_URL}/api/tour-packages?includeInactive=${includeInactive}`,
     {
+      method: "GET",
+      credentials: "include",
       cache: "no-store",
     },
   );
@@ -88,6 +107,7 @@ export const listarTourPackages = async (includeInactive = false) => {
 export const crearTourPackage = async (payload: TourPackagePayload) => {
   const response = await fetch(`${API_URL}/api/tour-packages`, {
     method: "POST",
+    credentials: "include",
     body: buildFormData(payload),
   });
 
@@ -111,6 +131,7 @@ export const actualizarTourPackage = async (
 ) => {
   const response = await fetch(`${API_URL}/api/tour-packages/${id}`, {
     method: "PUT",
+    credentials: "include",
     body: buildFormData(payload),
   });
 
@@ -131,6 +152,7 @@ export const actualizarTourPackage = async (
 export const eliminarTourPackage = async (id: number) => {
   const response = await fetch(`${API_URL}/api/tour-packages/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -148,6 +170,7 @@ export const reordenarTourPackages = async (
 ) => {
   const response = await fetch(`${API_URL}/api/tour-packages/reordenar/lista`, {
     method: "PATCH",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

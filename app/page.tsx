@@ -1,10 +1,13 @@
 import HeroCarousel from "./components/HeroCarousel";
 import ShareButtons from "./components/ShareButtons";
+import TourPackagesGrid from "./components/tours/TourPackagesGrid";
 
 const Home = () => {
   return (
     <main className="w-full bg-stone-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
       <HeroCarousel />
+
+      <TourPackagesGrid />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
@@ -29,7 +32,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-      <section></section>
     </main>
   );
 };
