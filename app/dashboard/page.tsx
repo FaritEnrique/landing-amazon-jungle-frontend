@@ -93,21 +93,40 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/30">
-          <h2 className="text-sm font-black uppercase tracking-tight text-emerald-950 dark:text-emerald-400">
-            SEO de la landing
-          </h2>
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/30">
+            <h2 className="text-sm font-black uppercase tracking-tight text-emerald-950 dark:text-emerald-400">
+              SEO de la landing
+            </h2>
 
-          <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-            Administra las palabras y frases clave que alimentan la metadata pública de Amazon Jungle Expeditions.
-          </p>
+            <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+              Administra las palabras y frases clave que alimentan la metadata pública de Amazon Jungle Expeditions.
+            </p>
 
-          <a
-            href="/dashboard/seo"
-            className="mt-4 inline-flex rounded-xl bg-emerald-800 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900"
-          >
-            Gestionar palabras clave
-          </a>
+            <a
+              href="/dashboard/seo"
+              className="mt-4 inline-flex rounded-xl bg-emerald-800 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900"
+            >
+              Gestionar palabras clave
+            </a>
+          </div>
+
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
+            <h2 className="text-sm font-black uppercase tracking-tight text-amber-950 dark:text-amber-300">
+              Carrusel principal
+            </h2>
+
+            <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+              Administra las imágenes de fondo, textos, botones y orden del hero superior de la landing.
+            </p>
+
+            <a
+              href="/dashboard/hero-carousel"
+              className="mt-4 inline-flex rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-950 transition hover:bg-amber-400"
+            >
+              Gestionar carrusel
+            </a>
+          </div>
         </div>
       </div>
     </div>
