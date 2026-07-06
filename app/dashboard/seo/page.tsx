@@ -39,35 +39,38 @@ import {
 } from "@/lib/seoApi";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://www.amazonjungle-expeditions.com";
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://landing.amazonjungle-expeditions.com";
 
 type ActiveSection = "landing" | "business" | "faqs" | "keywords";
 
 const emptyHomeForm: SeoHomePayload = {
-  title: "Amazon Jungle Expeditions | Albergue y tours en la Amazonía peruana",
+  title: "Amazon Jungle Expeditions | Tours en Iquitos y Amazon Tours",
   description:
-    "Experiencias auténticas en la Amazonía peruana: albergue, excursiones, naturaleza, cultura viva y aventura en Iquitos.",
+    "Reserva tours en Iquitos y Amazon tours from Iquitos. Experiencias auténticas en la Amazonía peruana con naturaleza, cultura viva, lodge y excursiones guiadas.",
   canonicalUrl: "",
-  ogTitle: "",
-  ogDescription: "",
+  ogTitle: "Tours en Iquitos y Amazon tours from Iquitos",
+  ogDescription:
+    "Discover Amazon Jungle Expeditions: tours, lodge, rainforest excursions and authentic experiences in the Peruvian Amazon from Iquitos.",
   ogImageUrl: "",
   twitterTitle: "",
   twitterDescription: "",
   twitterImageUrl: "",
   robotsIndex: true,
   robotsFollow: true,
-  focusKeyword: "tours en Iquitos",
+  focusKeyword: "tours en Iquitos | Amazon tours from Iquitos",
   secondaryKeywords:
-    "albergue en Iquitos, Amazonía peruana, excursiones en la selva, Amazon tours Peru",
+    "albergue en Iquitos, Amazonía peruana, excursiones en la selva, Amazon tours Peru, Peruvian Amazon tours, Iquitos jungle tours, Amazon jungle lodge Peru",
   shareMessage:
-    "Descubre Amazon Jungle Expeditions: albergue y tours auténticos en la Amazonía peruana desde Iquitos.",
+    "Descubre Amazon Jungle Expeditions: tours en Iquitos, Amazon tours from Iquitos y experiencias auténticas en la Amazonía peruana.",
 };
 
 const emptyBusinessForm: SeoBusinessProfilePayload = {
   businessName: "Amazon Jungle Expeditions",
   legalName: "",
   ruc: "",
-  description: "Albergue y experiencias turísticas en la Amazonía peruana desde Iquitos.",
+  description:
+    "Albergue y experiencias turísticas en la Amazonía peruana desde Iquitos.",
   phone: "+51 943214093",
   whatsapp: "51943214093",
   email: "",
@@ -116,9 +119,19 @@ const getLengthState = (value: string, min: number, max: number) => {
   return "text-emerald-700 dark:text-emerald-400";
 };
 
-const FieldHelp = ({ value, min, max }: { value: string; min: number; max: number }) => {
+const FieldHelp = ({
+  value,
+  min,
+  max,
+}: {
+  value: string;
+  min: number;
+  max: number;
+}) => {
   return (
-    <p className={`mt-1 text-[10px] font-bold ${getLengthState(value, min, max)}`}>
+    <p
+      className={`mt-1 text-[10px] font-bold ${getLengthState(value, min, max)}`}
+    >
       {value.trim().length} caracteres. Recomendado: {min}-{max}.
     </p>
   );
@@ -147,7 +160,10 @@ const SeoKeywordsPage = () => {
     [keywords],
   );
 
-  const activeFaqs = useMemo(() => faqs.filter((faq) => faq.isActive).length, [faqs]);
+  const activeFaqs = useMemo(
+    () => faqs.filter((faq) => faq.isActive).length,
+    [faqs],
+  );
 
   const loadSeoData = async (q = keywordSearch) => {
     setIsLoading(true);
@@ -161,12 +177,17 @@ const SeoKeywordsPage = () => {
       ]);
 
       setHomeForm({ ...emptyHomeForm, ...normalizeNullableForm(home.data) });
-      setBusinessForm({ ...emptyBusinessForm, ...normalizeNullableForm(business.data) });
+      setBusinessForm({
+        ...emptyBusinessForm,
+        ...normalizeNullableForm(business.data),
+      });
       setFaqs(faqResponse.faqs);
       setKeywords(keywordResponse.keywords);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "No se pudo cargar la configuración SEO";
+        error instanceof Error
+          ? error.message
+          : "No se pudo cargar la configuración SEO";
 
       toast.error(message);
     } finally {
@@ -211,7 +232,9 @@ const SeoKeywordsPage = () => {
       await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "No se pudo actualizar el SEO de la landing";
+        error instanceof Error
+          ? error.message
+          : "No se pudo actualizar el SEO de la landing";
 
       toast.error(message);
     } finally {
@@ -230,13 +253,17 @@ const SeoKeywordsPage = () => {
     setIsSubmitting(true);
 
     try {
-      const payload = normalizeNullableForm(businessForm) as SeoBusinessProfilePayload;
+      const payload = normalizeNullableForm(
+        businessForm,
+      ) as SeoBusinessProfilePayload;
       await updateSeoBusinessProfile(payload);
       toast.success("Perfil del negocio actualizado correctamente");
       await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "No se pudo actualizar el perfil del negocio";
+        error instanceof Error
+          ? error.message
+          : "No se pudo actualizar el perfil del negocio";
 
       toast.error(message);
     } finally {
@@ -272,7 +299,9 @@ const SeoKeywordsPage = () => {
       await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "No se pudo guardar la pregunta frecuente";
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar la pregunta frecuente";
 
       toast.error(message);
     } finally {
@@ -301,7 +330,9 @@ const SeoKeywordsPage = () => {
       await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "No se pudo eliminar la pregunta frecuente";
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar la pregunta frecuente";
 
       toast.error(message);
     }
@@ -342,7 +373,9 @@ const SeoKeywordsPage = () => {
       await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "No se pudo guardar la frase objetivo";
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar la frase objetivo";
 
       toast.error(message);
     } finally {
@@ -371,7 +404,9 @@ const SeoKeywordsPage = () => {
       await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "No se pudo eliminar la frase objetivo";
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar la frase objetivo";
 
       toast.error(message);
     }
@@ -425,7 +460,9 @@ const SeoKeywordsPage = () => {
               </h1>
 
               <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                Administra metadata, Open Graph, datos del negocio, preguntas frecuentes y frases objetivo. Todo se aplica a la única página pública <strong>/</strong>.
+                Administra metadata, Open Graph, datos del negocio, preguntas
+                frecuentes y frases objetivo. Todo se aplica a la única página
+                pública <strong>/</strong>.
               </p>
             </div>
 
@@ -454,7 +491,10 @@ const SeoKeywordsPage = () => {
                 disabled={isLoading}
                 className="rounded-2xl border border-emerald-700 px-4 py-3 text-xs font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
               >
-                <RefreshCw size={16} className={`mx-auto mb-1 ${isLoading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  size={16}
+                  className={`mx-auto mb-1 ${isLoading ? "animate-spin" : ""}`}
+                />
                 Recargar
               </button>
             </div>
@@ -485,7 +525,10 @@ const SeoKeywordsPage = () => {
         </div>
 
         {activeSection === "landing" ? (
-          <form onSubmit={handleSaveHome} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <form
+            onSubmit={handleSaveHome}
+            className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]"
+          >
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
               <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
                 Metadata principal
@@ -497,7 +540,9 @@ const SeoKeywordsPage = () => {
               <input
                 aria-label="Título SEO"
                 value={homeForm.title}
-                onChange={(event) => setHomeForm({ ...homeForm, title: event.target.value })}
+                onChange={(event) =>
+                  setHomeForm({ ...homeForm, title: event.target.value })
+                }
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
               <FieldHelp value={homeForm.title} min={45} max={65} />
@@ -508,7 +553,9 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="Meta description"
                 value={homeForm.description}
-                onChange={(event) => setHomeForm({ ...homeForm, description: event.target.value })}
+                onChange={(event) =>
+                  setHomeForm({ ...homeForm, description: event.target.value })
+                }
                 rows={4}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -521,7 +568,12 @@ const SeoKeywordsPage = () => {
                   </span>
                   <input
                     value={homeForm.canonicalUrl || ""}
-                    onChange={(event) => setHomeForm({ ...homeForm, canonicalUrl: event.target.value })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        canonicalUrl: event.target.value,
+                      })
+                    }
                     placeholder={SITE_URL}
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
@@ -533,7 +585,12 @@ const SeoKeywordsPage = () => {
                   </span>
                   <input
                     value={homeForm.ogImageUrl || ""}
-                    onChange={(event) => setHomeForm({ ...homeForm, ogImageUrl: event.target.value })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        ogImageUrl: event.target.value,
+                      })
+                    }
                     placeholder="/images/logos/Logo-sbg.webp o URL absoluta"
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
@@ -547,7 +604,9 @@ const SeoKeywordsPage = () => {
                   </span>
                   <input
                     value={homeForm.ogTitle || ""}
-                    onChange={(event) => setHomeForm({ ...homeForm, ogTitle: event.target.value })}
+                    onChange={(event) =>
+                      setHomeForm({ ...homeForm, ogTitle: event.target.value })
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
@@ -558,7 +617,12 @@ const SeoKeywordsPage = () => {
                   </span>
                   <input
                     value={homeForm.twitterImageUrl || ""}
-                    onChange={(event) => setHomeForm({ ...homeForm, twitterImageUrl: event.target.value })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        twitterImageUrl: event.target.value,
+                      })
+                    }
                     placeholder="Vacío usa la imagen OG"
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
@@ -571,7 +635,12 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="OG description"
                 value={homeForm.ogDescription || ""}
-                onChange={(event) => setHomeForm({ ...homeForm, ogDescription: event.target.value })}
+                onChange={(event) =>
+                  setHomeForm({
+                    ...homeForm,
+                    ogDescription: event.target.value,
+                  })
+                }
                 rows={3}
                 placeholder="Vacío usa la meta description"
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
@@ -583,7 +652,9 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="Mensaje de compartir"
                 value={homeForm.shareMessage || ""}
-                onChange={(event) => setHomeForm({ ...homeForm, shareMessage: event.target.value })}
+                onChange={(event) =>
+                  setHomeForm({ ...homeForm, shareMessage: event.target.value })
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -595,7 +666,12 @@ const SeoKeywordsPage = () => {
                   </span>
                   <input
                     value={homeForm.focusKeyword || ""}
-                    onChange={(event) => setHomeForm({ ...homeForm, focusKeyword: event.target.value })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        focusKeyword: event.target.value,
+                      })
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
@@ -606,7 +682,12 @@ const SeoKeywordsPage = () => {
                   </span>
                   <input
                     value={homeForm.secondaryKeywords || ""}
-                    onChange={(event) => setHomeForm({ ...homeForm, secondaryKeywords: event.target.value })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        secondaryKeywords: event.target.value,
+                      })
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
@@ -617,7 +698,12 @@ const SeoKeywordsPage = () => {
                   <input
                     type="checkbox"
                     checked={homeForm.robotsIndex}
-                    onChange={(event) => setHomeForm({ ...homeForm, robotsIndex: event.target.checked })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        robotsIndex: event.target.checked,
+                      })
+                    }
                     className="h-4 w-4 accent-emerald-700"
                   />
                   Indexar landing pública
@@ -627,7 +713,12 @@ const SeoKeywordsPage = () => {
                   <input
                     type="checkbox"
                     checked={homeForm.robotsFollow}
-                    onChange={(event) => setHomeForm({ ...homeForm, robotsFollow: event.target.checked })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        robotsFollow: event.target.checked,
+                      })
+                    }
                     className="h-4 w-4 accent-emerald-700"
                   />
                   Permitir follow
@@ -666,7 +757,9 @@ const SeoKeywordsPage = () => {
               </h2>
               <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                 <div className="flex aspect-video items-center justify-center bg-emerald-950 text-center text-xs font-black uppercase tracking-wider text-white/60">
-                  {homeForm.ogImageUrl ? "Imagen OG configurada" : "Sin imagen OG"}
+                  {homeForm.ogImageUrl
+                    ? "Imagen OG configurada"
+                    : "Sin imagen OG"}
                 </div>
                 <div className="p-4">
                   <p className="text-sm font-black text-slate-900 dark:text-white">
@@ -682,14 +775,21 @@ const SeoKeywordsPage = () => {
         ) : null}
 
         {activeSection === "business" ? (
-          <form onSubmit={handleSaveBusiness} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+          <form
+            onSubmit={handleSaveBusiness}
+            className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6"
+          >
             <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
               Perfil del negocio para JSON-LD
             </h2>
 
             <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
               {[
-                ["businessName", "Nombre comercial", "Amazon Jungle Expeditions"],
+                [
+                  "businessName",
+                  "Nombre comercial",
+                  "Amazon Jungle Expeditions",
+                ],
                 ["legalName", "Razón social", ""],
                 ["ruc", "RUC", ""],
                 ["phone", "Teléfono", "+51 943214093"],
@@ -712,7 +812,10 @@ const SeoKeywordsPage = () => {
                     {label}
                   </span>
                   <input
-                    value={String(businessForm[key as keyof SeoBusinessProfilePayload] || "")}
+                    value={String(
+                      businessForm[key as keyof SeoBusinessProfilePayload] ||
+                        "",
+                    )}
                     onChange={(event) =>
                       setBusinessForm({
                         ...businessForm,
@@ -732,7 +835,12 @@ const SeoKeywordsPage = () => {
             <textarea
               aria-label="Descripción del negocio"
               value={businessForm.description || ""}
-              onChange={(event) => setBusinessForm({ ...businessForm, description: event.target.value })}
+              onChange={(event) =>
+                setBusinessForm({
+                  ...businessForm,
+                  description: event.target.value,
+                })
+              }
               rows={4}
               className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
             />
@@ -750,7 +858,10 @@ const SeoKeywordsPage = () => {
 
         {activeSection === "faqs" ? (
           <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-            <form onSubmit={handleSaveFaq} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+            <form
+              onSubmit={handleSaveFaq}
+              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
@@ -779,7 +890,9 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="Pregunta frecuente"
                 value={faqForm.question}
-                onChange={(event) => setFaqForm({ ...faqForm, question: event.target.value })}
+                onChange={(event) =>
+                  setFaqForm({ ...faqForm, question: event.target.value })
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -790,7 +903,9 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="Respuesta frecuente"
                 value={faqForm.answer}
-                onChange={(event) => setFaqForm({ ...faqForm, answer: event.target.value })}
+                onChange={(event) =>
+                  setFaqForm({ ...faqForm, answer: event.target.value })
+                }
                 rows={5}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -803,7 +918,12 @@ const SeoKeywordsPage = () => {
                   <input
                     type="number"
                     value={faqForm.position}
-                    onChange={(event) => setFaqForm({ ...faqForm, position: Number(event.target.value) })}
+                    onChange={(event) =>
+                      setFaqForm({
+                        ...faqForm,
+                        position: Number(event.target.value),
+                      })
+                    }
                     className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-emerald-700 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
@@ -812,7 +932,9 @@ const SeoKeywordsPage = () => {
                   <input
                     type="checkbox"
                     checked={faqForm.isActive}
-                    onChange={(event) => setFaqForm({ ...faqForm, isActive: event.target.checked })}
+                    onChange={(event) =>
+                      setFaqForm({ ...faqForm, isActive: event.target.checked })
+                    }
                     className="h-4 w-4 accent-emerald-700"
                   />
                   Activa
@@ -825,7 +947,11 @@ const SeoKeywordsPage = () => {
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
               >
                 {editingFaqId ? <Save size={16} /> : <Plus size={16} />}
-                {isSubmitting ? "Guardando..." : editingFaqId ? "Guardar FAQ" : "Registrar FAQ"}
+                {isSubmitting
+                  ? "Guardando..."
+                  : editingFaqId
+                    ? "Guardar FAQ"
+                    : "Registrar FAQ"}
               </button>
             </form>
 
@@ -842,11 +968,16 @@ const SeoKeywordsPage = () => {
                 ) : null}
 
                 {faqs.map((faq) => (
-                  <article key={faq.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                  <article
+                    key={faq.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950"
+                  >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <div className="flex flex-wrap gap-2">
-                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${faq.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>
+                          <span
+                            className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${faq.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}
+                          >
                             {faq.isActive ? "Activa" : "Inactiva"}
                           </span>
                           <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-800">
@@ -889,14 +1020,17 @@ const SeoKeywordsPage = () => {
 
         {activeSection === "keywords" ? (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
-            <form onSubmit={handleSaveKeyword} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+            <form
+              onSubmit={handleSaveKeyword}
+              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
                     {editingKeywordId ? "Editar frase" : "Nueva frase"}
                   </h2>
                   <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                    Son apoyo editorial; el ranking depende del contenido visible y técnico.
+                    Son apoyo editorial para búsquedas en español e inglés; el ranking depende del contenido visible, la intención de búsqueda y el SEO técnico. 
                   </p>
                 </div>
 
@@ -918,7 +1052,9 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="Palabra o frase objetivo"
                 value={keywordForm.phrase}
-                onChange={(event) => setKeywordForm({ ...keywordForm, phrase: event.target.value })}
+                onChange={(event) =>
+                  setKeywordForm({ ...keywordForm, phrase: event.target.value })
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -929,7 +1065,9 @@ const SeoKeywordsPage = () => {
               <input
                 aria-label="Fuente de la frase objetivo"
                 value={keywordForm.source}
-                onChange={(event) => setKeywordForm({ ...keywordForm, source: event.target.value })}
+                onChange={(event) =>
+                  setKeywordForm({ ...keywordForm, source: event.target.value })
+                }
                 placeholder="WhatsApp, entrevista, Google, recomendación..."
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -940,7 +1078,9 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="Notas internas de la frase objetivo"
                 value={keywordForm.notes}
-                onChange={(event) => setKeywordForm({ ...keywordForm, notes: event.target.value })}
+                onChange={(event) =>
+                  setKeywordForm({ ...keywordForm, notes: event.target.value })
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -949,7 +1089,12 @@ const SeoKeywordsPage = () => {
                 <input
                   type="checkbox"
                   checked={keywordForm.isActive}
-                  onChange={(event) => setKeywordForm({ ...keywordForm, isActive: event.target.checked })}
+                  onChange={(event) =>
+                    setKeywordForm({
+                      ...keywordForm,
+                      isActive: event.target.checked,
+                    })
+                  }
                   className="h-4 w-4 accent-emerald-700"
                 />
                 Activa como frase objetivo
@@ -961,12 +1106,19 @@ const SeoKeywordsPage = () => {
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
               >
                 {editingKeywordId ? <Save size={16} /> : <Plus size={16} />}
-                {isSubmitting ? "Guardando..." : editingKeywordId ? "Guardar frase" : "Registrar frase"}
+                {isSubmitting
+                  ? "Guardando..."
+                  : editingKeywordId
+                    ? "Guardar frase"
+                    : "Registrar frase"}
               </button>
             </form>
 
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-              <form onSubmit={handleKeywordSearch} className="mb-5 flex flex-col gap-3 sm:flex-row">
+              <form
+                onSubmit={handleKeywordSearch}
+                className="mb-5 flex flex-col gap-3 sm:flex-row"
+              >
                 <input
                   aria-label="Buscar frase objetivo"
                   type="search"
@@ -994,11 +1146,16 @@ const SeoKeywordsPage = () => {
                 ) : null}
 
                 {keywords.map((keyword) => (
-                  <article key={keyword.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                  <article
+                    key={keyword.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950"
+                  >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${keyword.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>
+                          <span
+                            className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${keyword.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}
+                          >
                             {keyword.isActive ? "Activa" : "Inactiva"}
                           </span>
                           {keyword.source ? (
