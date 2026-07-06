@@ -1,5 +1,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+export type SeoImageTarget = "og" | "twitter";
+
 export interface SeoKeyword {
   id: string;
   phrase: string;
@@ -175,6 +177,44 @@ export const updateSeoHome = async (payload: SeoHomePayload) => {
   return parseApiResponse<{
     ok: boolean;
     message: string;
+    data: SeoHome;
+  }>(response);
+};
+
+
+export const uploadSeoHomeImage = async (
+  target: SeoImageTarget,
+  file: File,
+) => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${API_URL}/api/seo/home/images/${target}`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    field: "ogImageUrl" | "twitterImageUrl";
+    imageUrl: string;
+    data: SeoHome;
+  }>(response);
+};
+
+export const deleteSeoHomeImage = async (target: SeoImageTarget) => {
+  const response = await fetch(`${API_URL}/api/seo/home/images/${target}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    field: "ogImageUrl" | "twitterImageUrl";
+    imageUrl: null;
     data: SeoHome;
   }>(response);
 };

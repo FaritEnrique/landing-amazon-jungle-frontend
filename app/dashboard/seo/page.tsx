@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Building2,
   Eye,
   HelpCircle,
+  ImageUp,
   KeyRound,
   Pencil,
   Plus,
@@ -23,21 +24,25 @@ import {
   createSeoFaq,
   createSeoKeyword,
   deleteSeoFaq,
+  deleteSeoHomeImage,
   deleteSeoKeyword,
   getSeoBusinessProfile,
   getSeoHome,
   listSeoFaqs,
   listSeoKeywords,
   updateSeoBusinessProfile,
+  uploadSeoHomeImage,
   updateSeoFaq,
   updateSeoHome,
   updateSeoKeyword,
   type SeoBusinessProfilePayload,
   type SeoFaq,
   type SeoHomePayload,
+  type SeoImageTarget,
   type SeoKeyword,
 } from "@/lib/seoApi";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   "https://landing.amazonjungle-expeditions.com";
@@ -52,7 +57,7 @@ const emptyHomeForm: SeoHomePayload = {
   ogTitle: "Tours en Iquitos y Amazon tours from Iquitos",
   ogDescription:
     "Discover Amazon Jungle Expeditions: tours, lodge, rainforest excursions and authentic experiences in the Peruvian Amazon from Iquitos.",
-  ogImageUrl: "",
+  ogImageUrl: "/images/seo/og-amazon-jungle-expeditions.jpg",
   twitterTitle: "",
   twitterDescription: "",
   twitterImageUrl: "",
@@ -137,6 +142,126 @@ const FieldHelp = ({
   );
 };
 
+
+const getSeoImageField = (target: SeoImageTarget) => {
+  return target === "og" ? "ogImageUrl" : "twitterImageUrl";
+};
+
+const getSeoImageLabel = (target: SeoImageTarget) => {
+  return target === "og" ? "Imagen OG / WhatsApp" : "Imagen Twitter/X";
+};
+
+const resolveSeoPreviewUrl = (url?: string | null) => {
+  if (!url) return null;
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  if (url.startsWith("/uploads/")) {
+    return `${API_URL}${url}`;
+  }
+
+  if (url.startsWith("/")) {
+    return `${SITE_URL}${url}`;
+  }
+
+  return url;
+};
+
+interface SeoImageManagerProps {
+  target: SeoImageTarget;
+  value: string | null | undefined;
+  placeholder: string;
+  isBusy: boolean;
+  onUrlChange: (value: string) => void;
+  onUpload: (target: SeoImageTarget, event: ChangeEvent<HTMLInputElement>) => void;
+  onDelete: (target: SeoImageTarget) => void;
+}
+
+const SeoImageManager = ({
+  target,
+  value,
+  placeholder,
+  isBusy,
+  onUrlChange,
+  onUpload,
+  onDelete,
+}: SeoImageManagerProps) => {
+  const previewUrl = resolveSeoPreviewUrl(value);
+  const inputId = `seo-image-${target}`;
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {getSeoImageLabel(target)}
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+            Recomendado: JPG/PNG/WEBP. El backend optimiza a 1200 × 630 px para redes sociales.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <label
+            htmlFor={inputId}
+            className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-700 px-3 py-2 text-[11px] font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 dark:text-emerald-400 ${
+              isBusy ? "pointer-events-none opacity-60" : ""
+            }`}
+          >
+            <ImageUp size={15} />
+            {value ? "Reemplazar" : "Subir"}
+          </label>
+
+          <input
+            id={inputId}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            disabled={isBusy}
+            onChange={(event) => onUpload(target, event)}
+          />
+
+          {value ? (
+            <button
+              type="button"
+              onClick={() => onDelete(target)}
+              disabled={isBusy}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 px-3 py-2 text-[11px] font-black uppercase tracking-wider text-red-600 transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900/40"
+            >
+              <Trash2 size={15} />
+              Borrar
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      {previewUrl ? (
+        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+          <img
+            src={previewUrl}
+            alt={`Vista previa de ${getSeoImageLabel(target)}`}
+            className="aspect-[1200/630] w-full object-cover"
+          />
+        </div>
+      ) : (
+        <div className="mt-4 flex aspect-[1200/630] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white text-center text-[11px] font-black uppercase tracking-wider text-slate-400 dark:border-slate-700 dark:bg-slate-900">
+          Sin imagen configurada
+        </div>
+      )}
+
+      <input
+        aria-label={`${getSeoImageLabel(target)} URL`}
+        value={value || ""}
+        onChange={(event) => onUrlChange(event.target.value)}
+        placeholder={placeholder}
+        className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-900"
+      />
+    </div>
+  );
+};
+
 const SeoKeywordsPage = () => {
   const router = useRouter();
 
@@ -154,6 +279,7 @@ const SeoKeywordsPage = () => {
   const [isChecking, setIsChecking] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [busyImageTarget, setBusyImageTarget] = useState<SeoImageTarget | null>(null);
 
   const activeKeywords = useMemo(
     () => keywords.filter((keyword) => keyword.isActive).length,
@@ -239,6 +365,76 @@ const SeoKeywordsPage = () => {
       toast.error(message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+
+  const handleUploadSeoImage = async (
+    target: SeoImageTarget,
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Seleccione una imagen JPG, PNG o WEBP");
+      return;
+    }
+
+    setBusyImageTarget(target);
+
+    try {
+      const response = await uploadSeoHomeImage(target, file);
+      const field = getSeoImageField(target);
+
+      setHomeForm((current) => ({
+        ...current,
+        [field]: response.imageUrl,
+      }));
+
+      toast.success(response.message || "Imagen SEO actualizada correctamente");
+      await loadSeoData();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "No se pudo cargar la imagen SEO";
+
+      toast.error(message);
+    } finally {
+      setBusyImageTarget(null);
+    }
+  };
+
+  const handleDeleteSeoImage = async (target: SeoImageTarget) => {
+    const label = getSeoImageLabel(target);
+
+    if (!window.confirm(`¿Borrar la ${label.toLowerCase()}?`)) {
+      return;
+    }
+
+    setBusyImageTarget(target);
+
+    try {
+      const response = await deleteSeoHomeImage(target);
+      const field = getSeoImageField(target);
+
+      setHomeForm((current) => ({
+        ...current,
+        [field]: "",
+      }));
+
+      toast.success(response.message || "Imagen SEO eliminada correctamente");
+      await loadSeoData();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "No se pudo borrar la imagen SEO";
+
+      toast.error(message);
+    } finally {
+      setBusyImageTarget(null);
     }
   };
 
@@ -579,22 +775,20 @@ const SeoKeywordsPage = () => {
                   />
                 </label>
 
-                <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Imagen OG / WhatsApp
-                  </span>
-                  <input
-                    value={homeForm.ogImageUrl || ""}
-                    onChange={(event) =>
-                      setHomeForm({
-                        ...homeForm,
-                        ogImageUrl: event.target.value,
-                      })
-                    }
-                    placeholder="/images/logos/Logo-sbg.webp o URL absoluta"
-                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
-                  />
-                </label>
+                <SeoImageManager
+                  target="og"
+                  value={homeForm.ogImageUrl}
+                  placeholder="/uploads/seo/images/archivo.jpg o URL absoluta"
+                  isBusy={busyImageTarget === "og"}
+                  onUrlChange={(value) =>
+                    setHomeForm({
+                      ...homeForm,
+                      ogImageUrl: value,
+                    })
+                  }
+                  onUpload={handleUploadSeoImage}
+                  onDelete={handleDeleteSeoImage}
+                />
               </div>
 
               <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -611,22 +805,20 @@ const SeoKeywordsPage = () => {
                   />
                 </label>
 
-                <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Twitter image
-                  </span>
-                  <input
-                    value={homeForm.twitterImageUrl || ""}
-                    onChange={(event) =>
-                      setHomeForm({
-                        ...homeForm,
-                        twitterImageUrl: event.target.value,
-                      })
-                    }
-                    placeholder="Vacío usa la imagen OG"
-                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
-                  />
-                </label>
+                <SeoImageManager
+                  target="twitter"
+                  value={homeForm.twitterImageUrl}
+                  placeholder="Vacío usa la imagen OG"
+                  isBusy={busyImageTarget === "twitter"}
+                  onUrlChange={(value) =>
+                    setHomeForm({
+                      ...homeForm,
+                      twitterImageUrl: value,
+                    })
+                  }
+                  onUpload={handleUploadSeoImage}
+                  onDelete={handleDeleteSeoImage}
+                />
               </div>
 
               <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -756,11 +948,17 @@ const SeoKeywordsPage = () => {
                 Vista previa social
               </h2>
               <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
-                <div className="flex aspect-video items-center justify-center bg-emerald-950 text-center text-xs font-black uppercase tracking-wider text-white/60">
-                  {homeForm.ogImageUrl
-                    ? "Imagen OG configurada"
-                    : "Sin imagen OG"}
-                </div>
+                {resolveSeoPreviewUrl(homeForm.ogImageUrl) ? (
+                  <img
+                    src={resolveSeoPreviewUrl(homeForm.ogImageUrl) || ""}
+                    alt="Vista previa social"
+                    className="aspect-video w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex aspect-video items-center justify-center bg-emerald-950 text-center text-xs font-black uppercase tracking-wider text-white/60">
+                    Sin imagen OG
+                  </div>
+                )}
                 <div className="p-4">
                   <p className="text-sm font-black text-slate-900 dark:text-white">
                     {homeForm.ogTitle || homeForm.title}
