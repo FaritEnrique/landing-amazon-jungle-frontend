@@ -6,6 +6,7 @@ import { Menu, Phone, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { FaInstagram, FaYoutube } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { LuNetwork } from "react-icons/lu";
 
 const Header = () => {
   const pathname = usePathname();
@@ -107,7 +108,7 @@ const Header = () => {
                   "relative overflow-hidden rounded-full transition-all duration-300",
                   isOverlayHeader
                     ? "h-14 w-14 bg-white/10 ring-2 ring-white/40 lg:h-20 lg:w-20"
-                    : "h-12 w-12 bg-emerald-950 shadow-md ring-2 ring-emerald-700/20 lg:h-14 lg:w-14",
+                    : "h-12 w-12 bg-transparent shadow-md ring-2 ring-emerald-700/20 lg:h-14 lg:w-14",
                 ].join(" ")}
               >
                 <Image
@@ -156,7 +157,7 @@ const Header = () => {
                     : "bg-emerald-700 text-white shadow-emerald-900/15 hover:bg-emerald-800",
                 ].join(" ")}
               >
-                Intranet
+                <LuNetwork size={24} title="Intranet Corporativa" />
               </Link>
             </div>
 
@@ -217,7 +218,7 @@ const Header = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className="mt-3 rounded-full bg-emerald-700 px-5 py-3 text-center font-black uppercase tracking-wide text-white transition hover:bg-emerald-800"
                 >
-                  Intranet
+                  <LuNetwork size={18} />
                 </Link>
               </nav>
             </div>

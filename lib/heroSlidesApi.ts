@@ -11,8 +11,6 @@ export interface HeroSlide {
   description: string | null;
   primaryButtonText: string | null;
   primaryButtonUrl: string | null;
-  secondaryButtonText: string | null;
-  secondaryButtonUrl: string | null;
   backgroundPosition: string;
   sortOrder: number;
   isActive: boolean;
@@ -40,8 +38,6 @@ export interface HeroSlidePayload {
   description?: string | null;
   primaryButtonText?: string | null;
   primaryButtonUrl?: string | null;
-  secondaryButtonText?: string | null;
-  secondaryButtonUrl?: string | null;
   backgroundPosition?: string;
   sortOrder?: number;
   isActive?: boolean;

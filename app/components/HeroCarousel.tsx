@@ -23,8 +23,6 @@ const fallbackSlides: HeroSlide[] = [
     primaryButtonText: "Reserve on WhatsApp",
     primaryButtonUrl:
       "https://wa.me/51943214093?text=Hello%20Amazon%20Jungle%20Expeditions%2C%20I%20would%20like%20to%20make%20a%20reservation.",
-    secondaryButtonText: null,
-    secondaryButtonUrl: null,
     backgroundPosition: "center center",
     sortOrder: 0,
     isActive: true,
@@ -74,7 +72,9 @@ interface HeroCarouselProps {
   initialSlides?: HeroSlide[];
 }
 
-const HeroCarousel = ({ initialSlides = fallbackSlides }: HeroCarouselProps) => {
+const HeroCarousel = ({
+  initialSlides = fallbackSlides,
+}: HeroCarouselProps) => {
   const [slides, setSlides] = useState<HeroSlide[]>(
     initialSlides.length > 0 ? initialSlides : fallbackSlides,
   );
@@ -158,17 +158,8 @@ const HeroCarousel = ({ initialSlides = fallbackSlides }: HeroCarouselProps) => 
     currentSlide.primaryButtonUrl?.trim(),
   );
 
-  const hasSecondaryButton = Boolean(
-    currentSlide.secondaryButtonText?.trim() &&
-    currentSlide.secondaryButtonUrl?.trim(),
-  );
-
   const hasOverlayContent = Boolean(
-    eyebrow ||
-    hasTitle ||
-    description ||
-    hasPrimaryButton ||
-    hasSecondaryButton,
+    eyebrow || hasTitle || description || hasPrimaryButton,
   );
 
   const backgroundImageUrl = resolveHeroImageUrl(currentSlide.imageUrl);
@@ -186,22 +177,18 @@ const HeroCarousel = ({ initialSlides = fallbackSlides }: HeroCarouselProps) => 
     >
       <span className="sr-only">{currentSlide.altText}</span>
 
-      <div className="absolute inset-0 -z-10 bg-black/45" />
-      <div className="absolute inset-0 -z-10 bg-linear-to-r from-black/80 via-black/45 to-black/10" />
-      <div className="absolute inset-0 -z-10 bg-linear-to-t from-black/70 via-transparent to-black/20" />
-
       {hasOverlayContent && (
         <div className="mx-auto flex min-h-svh max-w-7xl items-center px-4 pb-16 pt-36 sm:px-6 lg:pb-20 lg:pt-44">
           <div className="max-w-4xl animate-fade-in">
             {eyebrow && (
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-wide text-white/90 shadow-lg shadow-black/10 backdrop-blur-md sm:text-xs">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-amber-400 px-4 py-2 text-[11px] font-black uppercase tracking-wide text-emerald-900 shadow-lg shadow-black/10 backdrop-blur-md sm:text-xs">
                 <MapPin size={14} aria-hidden="true" />
                 {eyebrow}
               </div>
             )}
 
             {hasTitle && (
-              <h1 className="font-display text-4xl font-black leading-[1.04] tracking-tight text-white drop-shadow-xl sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="font-display text-4xl font-black leading-[1.04] tracking-tight text-slate-950 drop-shadow-xl sm:text-5xl md:text-6xl lg:text-7xl">
                 {titleBefore}
                 {titleHighlight && (
                   <>
@@ -214,25 +201,16 @@ const HeroCarousel = ({ initialSlides = fallbackSlides }: HeroCarouselProps) => 
             )}
 
             {description && (
-              <p className="mt-6 max-w-2xl text-sm font-medium leading-7 text-white/85 drop-shadow sm:text-base md:text-lg md:leading-8">
+              <p className="mt-6 max-w-2xl text-sm font-medium leading-7 text-slate-900 drop-shadow sm:text-base md:text-lg md:leading-8">
                 {description}
               </p>
             )}
 
-            {(hasPrimaryButton || hasSecondaryButton) && (
+            {hasPrimaryButton && currentSlide.primaryButtonUrl && (
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 {hasPrimaryButton && currentSlide.primaryButtonUrl && (
                   <HeroActionLink href={currentSlide.primaryButtonUrl}>
                     {currentSlide.primaryButtonText}
-                  </HeroActionLink>
-                )}
-
-                {hasSecondaryButton && currentSlide.secondaryButtonUrl && (
-                  <HeroActionLink
-                    href={currentSlide.secondaryButtonUrl}
-                    variant="secondary"
-                  >
-                    {currentSlide.secondaryButtonText}
                   </HeroActionLink>
                 )}
               </div>
