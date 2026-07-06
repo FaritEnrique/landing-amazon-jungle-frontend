@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
@@ -33,27 +32,17 @@ const fallbackSlides: HeroSlide[] = [
 
 const AUTOPLAY_DELAY = 6500;
 
-const isExternalUrl = (url: string) => {
-  return url.startsWith("http://") || url.startsWith("https://");
-};
-
 const HeroActionLink = ({
   href,
   children,
-  variant = "primary",
 }: {
   href: string;
   children: ReactNode;
-  variant?: "primary" | "secondary";
 }) => {
-  const className = [
-    "inline-flex items-center justify-center rounded-full px-6 py-3 text-xs font-black uppercase tracking-[0.18em] shadow-lg transition sm:px-7",
-    variant === "primary"
-      ? "bg-amber-400 text-emerald-950 shadow-black/20 hover:bg-amber-300"
-      : "border border-white/30 bg-white/10 text-white backdrop-blur-md hover:bg-white/20",
-  ].join(" ");
+  const className =
+    "inline-flex items-center justify-center rounded-full bg-amber-400 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-950 shadow-lg shadow-black/20 transition hover:bg-amber-300 sm:px-7";
 
-  if (isExternalUrl(href)) {
+  if (href.startsWith("http://") || href.startsWith("https://")) {
     return (
       <a href={href} target="_blank" rel="noreferrer" className={className}>
         {children}
@@ -62,9 +51,9 @@ const HeroActionLink = ({
   }
 
   return (
-    <Link href={href} className={className}>
+    <a href={href} className={className}>
       {children}
-    </Link>
+    </a>
   );
 };
 
@@ -208,11 +197,9 @@ const HeroCarousel = ({
 
             {hasPrimaryButton && currentSlide.primaryButtonUrl && (
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                {hasPrimaryButton && currentSlide.primaryButtonUrl && (
-                  <HeroActionLink href={currentSlide.primaryButtonUrl}>
-                    {currentSlide.primaryButtonText}
-                  </HeroActionLink>
-                )}
+                <HeroActionLink href={currentSlide.primaryButtonUrl}>
+                  {currentSlide.primaryButtonText}
+                </HeroActionLink>
               </div>
             )}
           </div>

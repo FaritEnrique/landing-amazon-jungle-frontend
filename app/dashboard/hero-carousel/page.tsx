@@ -46,8 +46,6 @@ const emptyForm = {
   description: "",
   primaryButtonText: "Reservar por WhatsApp",
   primaryButtonUrl: "https://wa.me/51943214093",
-  secondaryButtonText: "Ver excursiones",
-  secondaryButtonUrl: "#excursions",
   backgroundPosition: "center center",
   sortOrder: 0,
   isActive: true,
@@ -219,8 +217,6 @@ const HeroCarouselAdminPage = () => {
         description: formData.description || null,
         primaryButtonText: formData.primaryButtonText || null,
         primaryButtonUrl: formData.primaryButtonUrl || null,
-        secondaryButtonText: formData.secondaryButtonText || null,
-        secondaryButtonUrl: formData.secondaryButtonUrl || null,
         backgroundPosition: formData.backgroundPosition,
         sortOrder: Number.isFinite(Number(formData.sortOrder))
           ? Number(formData.sortOrder)
@@ -263,8 +259,6 @@ const HeroCarouselAdminPage = () => {
       description: slide.description || "",
       primaryButtonText: slide.primaryButtonText || "",
       primaryButtonUrl: slide.primaryButtonUrl || "",
-      secondaryButtonText: slide.secondaryButtonText || "",
-      secondaryButtonUrl: slide.secondaryButtonUrl || "",
       backgroundPosition: slide.backgroundPosition || "center center",
       sortOrder: slide.sortOrder,
       isActive: slide.isActive,
@@ -449,30 +443,27 @@ const HeroCarouselAdminPage = () => {
                     }}
                   >
                     {hasFormOverlayContent && (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
-                        <div className="relative p-5 text-white">
-                          {formData.eyebrow && (
-                            <span className="inline-flex rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wide backdrop-blur-md">
-                              {formData.eyebrow}
-                            </span>
-                          )}
-                          {hasFormTitle && (
-                            <h3 className="mt-4 font-display text-3xl font-black leading-tight drop-shadow">
-                              {formData.titleBefore}
-                              {formData.titleHighlight && (
-                                <>
-                                  {formData.titleBefore && <br />}
-                                  <span className="text-amber-400">
-                                    {formData.titleHighlight}
-                                  </span>
-                                </>
-                              )}
-                              {formData.titleAfter && <> {formData.titleAfter}</>}
-                            </h3>
-                          )}
-                        </div>
-                      </>
+                      <div className="relative p-5 text-slate-950">
+                        {formData.eyebrow && (
+                          <span className="inline-flex rounded-full bg-amber-400 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-900 shadow-sm">
+                            {formData.eyebrow}
+                          </span>
+                        )}
+                        {hasFormTitle && (
+                          <h3 className="mt-4 font-display text-3xl font-black leading-tight drop-shadow">
+                            {formData.titleBefore}
+                            {formData.titleHighlight && (
+                              <>
+                                {formData.titleBefore && <br />}
+                                <span className="text-amber-400">
+                                  {formData.titleHighlight}
+                                </span>
+                              </>
+                            )}
+                            {formData.titleAfter && <> {formData.titleAfter}</>}
+                          </h3>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
@@ -610,41 +601,6 @@ const HeroCarouselAdminPage = () => {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                    Botón secundario
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-emerald-500"
-                    value={formData.secondaryButtonText}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        secondaryButtonText: event.target.value,
-                      })
-                    }
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                    URL botón secundario
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-emerald-500"
-                    value={formData.secondaryButtonUrl}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        secondaryButtonUrl: event.target.value,
-                      })
-                    }
-                    disabled={isSubmitting}
-                  />
-                </div>
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400">
@@ -766,10 +722,7 @@ const HeroCarouselAdminPage = () => {
                         backgroundPosition: slide.backgroundPosition,
                       }}
                     >
-                      {showOverlayContent && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-                      )}
-                      <div className="relative p-5 text-white sm:p-6">
+                      <div className="relative p-5 text-slate-950 sm:p-6">
                         <div className="flex flex-wrap items-center gap-2">
                           <span
                             className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${
@@ -781,7 +734,7 @@ const HeroCarouselAdminPage = () => {
                             {slide.isActive ? "Activo" : "Inactivo"}
                           </span>
 
-                          <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white backdrop-blur-md">
+                          <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-800 shadow-sm">
                             Orden {slide.sortOrder}
                           </span>
                         </div>
