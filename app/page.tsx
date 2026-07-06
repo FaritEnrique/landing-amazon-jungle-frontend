@@ -241,9 +241,9 @@ const Home = async () => {
               Amazon Jungle Expeditions
             </p>
 
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white sm:text-4xl lg:text-5xl">
               Experience the Amazon from Iquitos
-            </h1>
+            </h2>
 
             <p className="mt-5 text-base leading-8 text-slate-600 dark:text-slate-300 sm:text-lg">
               Discover the rainforest through guided excursions, authentic
