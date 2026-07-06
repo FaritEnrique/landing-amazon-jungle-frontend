@@ -35,19 +35,51 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.amazonjungle-expeditions.com";
+const normalizeBaseUrl = (url: string) => url.replace(/\/$/, "");
+
+const API_URL = normalizeBaseUrl(
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
+);
+
+const SITE_URL = normalizeBaseUrl(
+  process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://landing.amazonjungle-expeditions.com",
+);
 
 const fallbackSeoMetadata = {
-  title: "Amazon Jungle Expeditions | Albergue y tours en la Amazonía peruana",
+  title: "Amazon Jungle Expeditions | Tours en Iquitos y Amazon Tours",
   description:
-    "Experiencias auténticas en la Amazonía peruana: albergue, excursiones, naturaleza, cultura viva y aventura en Iquitos.",
+    "Reserva tours en Iquitos y Amazon tours from Iquitos. Experiencias auténticas en la Amazonía peruana con lodge, excursiones guiadas, naturaleza, cultura viva y aventura.",
   keywords: [
     "Amazon Jungle Expeditions",
-    "albergue en Iquitos",
-    "tours en la Amazonía peruana",
+    "tours en Iquitos",
+    "tour en Iquitos",
+    "excursiones en Iquitos",
     "excursiones en la selva",
+    "tours en la selva peruana",
+    "tours en la Amazonía peruana",
+    "albergue en Iquitos",
+    "lodge en Iquitos",
+    "albergue en la selva",
+    "lodge en la Amazonía peruana",
+    "viaje a la Amazonía peruana",
+    "turismo en Iquitos",
+    "selva de Iquitos",
     "Amazonas Perú",
+    "Amazon tours from Iquitos",
+    "Iquitos Amazon tours",
+    "Iquitos jungle tours",
+    "Amazon jungle tours Peru",
+    "Peruvian Amazon tours",
+    "Amazon rainforest tours Peru",
+    "Amazon lodge Iquitos",
+    "Amazon jungle lodge Peru",
+    "Peru jungle lodge",
+    "Amazon rainforest lodge",
+    "Amazon jungle expeditions Peru",
+    "jungle lodge near Iquitos",
+    "rainforest tours from Iquitos",
+    "Peruvian rainforest experience",
   ],
   canonicalUrl: null as string | null,
   ogTitle: null as string | null,
@@ -121,15 +153,18 @@ const getSeoMetadata = async () => {
           : fallbackSeoMetadata.keywords,
       canonicalUrl: data.data?.canonicalUrl || fallbackSeoMetadata.canonicalUrl,
       ogTitle: data.data?.ogTitle || fallbackSeoMetadata.ogTitle,
-      ogDescription: data.data?.ogDescription || fallbackSeoMetadata.ogDescription,
+      ogDescription:
+        data.data?.ogDescription || fallbackSeoMetadata.ogDescription,
       ogImageUrl: data.data?.ogImageUrl || fallbackSeoMetadata.ogImageUrl,
       twitterTitle: data.data?.twitterTitle || fallbackSeoMetadata.twitterTitle,
       twitterDescription:
         data.data?.twitterDescription || fallbackSeoMetadata.twitterDescription,
-      twitterImageUrl: data.data?.twitterImageUrl || fallbackSeoMetadata.twitterImageUrl,
+      twitterImageUrl:
+        data.data?.twitterImageUrl || fallbackSeoMetadata.twitterImageUrl,
       robotsIndex: data.data?.robotsIndex ?? fallbackSeoMetadata.robotsIndex,
       robotsFollow: data.data?.robotsFollow ?? fallbackSeoMetadata.robotsFollow,
-      businessName: data.data?.business?.businessName || "Amazon Jungle Expeditions",
+      businessName:
+        data.data?.business?.businessName || "Amazon Jungle Expeditions",
     };
   } catch {
     return fallbackSeoMetadata;
@@ -140,11 +175,16 @@ export const generateMetadata = async (): Promise<Metadata> => {
   const seo = await getSeoMetadata();
 
   const ogImage = resolveAbsoluteUrl(seo.ogImageUrl);
-  const twitterImage = resolveAbsoluteUrl(seo.twitterImageUrl || seo.ogImageUrl);
-  const canonicalUrl = seo.canonicalUrl || SITE_URL;
+  const twitterImage = resolveAbsoluteUrl(
+    seo.twitterImageUrl || seo.ogImageUrl,
+  );
+  const canonicalUrl = resolveAbsoluteUrl(seo.canonicalUrl) || SITE_URL;
 
   return {
     metadataBase: new URL(SITE_URL),
+    applicationName: "Amazon Jungle Expeditions",
+    creator: "Amazon Jungle Expeditions",
+    publisher: seo.businessName || "Amazon Jungle Expeditions",
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords,
@@ -194,7 +234,7 @@ const RootLayout = ({
 }>) => {
   return (
     <html
-      lang="es"
+      lang="es-PE"
       className={`${montserrat.variable} ${playfair.variable} ${greatVibes.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden font-sans">

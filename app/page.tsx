@@ -9,7 +9,8 @@ import {
 } from "@/lib/tourPackagesApi";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://www.amazonjungle-expeditions.com";
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://landing.amazonjungle-expeditions.com";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 const resolveAbsoluteUrl = (url?: string | null) => {
@@ -130,8 +131,13 @@ const buildJsonLd = ({
               "@type": "TouristTrip",
               name: tour.bottomTitle || tour.overlayTitle,
               description:
-                tour.longDescription || tour.excerpt || tour.bottomDescription || tour.overlayTitle,
-              image: resolveAbsoluteUrl(resolveTourPackageImageUrl(tour.imageWebpUrl)),
+                tour.longDescription ||
+                tour.excerpt ||
+                tour.bottomDescription ||
+                tour.overlayTitle,
+              image: resolveAbsoluteUrl(
+                resolveTourPackageImageUrl(tour.imageWebpUrl),
+              ),
               touristType: tour.location || "Amazon rainforest tour",
               offers:
                 tour.priceAmount || tour.price
@@ -180,7 +186,7 @@ const Home = async () => {
   const shareMessage = landingSeo?.metadata?.shareMessage || undefined;
 
   return (
-    <main className="w-full bg-stone-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    <div className="w-full bg-stone-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
       {jsonLd.map((item, index) => (
         <script
           key={index}
@@ -194,7 +200,10 @@ const Home = async () => {
       <TourPackagesGrid />
 
       {faqs.length > 0 ? (
-        <section id="faq" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <section
+          id="faq"
+          className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+        >
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700 dark:text-emerald-400">
               Frequently asked questions
@@ -222,7 +231,10 @@ const Home = async () => {
         </section>
       ) : null}
 
-      <section id="contact" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section
+        id="contact"
+        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
+      >
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700 dark:text-emerald-400">
@@ -245,7 +257,7 @@ const Home = async () => {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 
