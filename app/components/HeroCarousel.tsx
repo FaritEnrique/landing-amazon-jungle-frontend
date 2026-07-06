@@ -70,10 +70,16 @@ const HeroActionLink = ({
   );
 };
 
-const HeroCarousel = () => {
-  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
+interface HeroCarouselProps {
+  initialSlides?: HeroSlide[];
+}
+
+const HeroCarousel = ({ initialSlides = fallbackSlides }: HeroCarouselProps) => {
+  const [slides, setSlides] = useState<HeroSlide[]>(
+    initialSlides.length > 0 ? initialSlides : fallbackSlides,
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(initialSlides.length === 0);
 
   const activeSlides = useMemo(() => {
     return slides.filter((slide) => slide.isActive && slide.imageUrl);

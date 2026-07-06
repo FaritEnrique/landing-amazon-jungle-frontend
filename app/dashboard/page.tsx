@@ -100,14 +100,14 @@ const DashboardPage = () => {
             </h2>
 
             <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-              Administra las palabras y frases clave que alimentan la metadata pública de Amazon Jungle Expeditions.
+              Administra metadata, Open Graph, perfil del negocio, FAQs y frases objetivo de la única landing pública.
             </p>
 
             <a
               href="/dashboard/seo"
               className="mt-4 inline-flex rounded-xl bg-emerald-800 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900"
             >
-              Gestionar palabras clave
+              Gestionar SEO
             </a>
           </div>
 

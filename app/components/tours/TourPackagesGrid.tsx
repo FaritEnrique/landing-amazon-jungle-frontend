@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, MapPin } from "lucide-react";
 import {
   listarTourPackages,
   resolveTourPackageImageUrl,
@@ -34,47 +31,25 @@ const TourPackageButton = ({ href, label }: { href: string; label: string }) => 
   );
 };
 
-const TourPackagesGrid = () => {
-  const [packages, setPackages] = useState<TourPackage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    listarTourPackages(false)
-      .then((data) => {
-        if (!isMounted) return;
-        setPackages(data);
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        setPackages([]);
-      })
-      .finally(() => {
-        if (!isMounted) return;
-        setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const activePackages = useMemo(() => {
-    return packages
-      .filter((pkg) => pkg.active && pkg.imageWebpUrl)
-      .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
-  }, [packages]);
-
-  if (isLoading) {
-    return (
-      <section id="excursions" className="w-full bg-[#465c12]/10 px-4 py-12">
-        <div className="mx-auto max-w-7xl rounded-3xl border border-emerald-100 bg-white/70 p-8 text-center text-sm font-semibold text-slate-500 shadow-sm dark:border-emerald-900/30 dark:bg-slate-900/70 dark:text-slate-400">
-          Cargando paquetes turísticos...
-        </div>
-      </section>
-    );
+const getPublicTourPackages = async () => {
+  try {
+    return await listarTourPackages(false, {
+      cache: "force-cache",
+      next: {
+        revalidate: 300,
+      },
+    });
+  } catch {
+    return [];
   }
+};
+
+const TourPackagesGrid = async () => {
+  const packages = await getPublicTourPackages();
+
+  const activePackages = packages
+    .filter((pkg) => pkg.active && pkg.imageWebpUrl)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
 
   if (activePackages.length === 0) {
     return null;
@@ -91,22 +66,35 @@ const TourPackagesGrid = () => {
           <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-emerald-950 dark:text-white sm:text-4xl">
             Choose your Amazon experience
           </h2>
+
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-7 text-slate-700 dark:text-slate-300 sm:text-base">
+            Guided tours and lodge-based rainforest experiences from Iquitos,
+            designed for travelers looking for nature, culture and authentic
+            Amazonian hospitality.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-          {activePackages.map((pkg) => {
+          {activePackages.map((pkg: TourPackage) => {
             const hasButton = Boolean(pkg.buttonLabel?.trim() && pkg.buttonHref?.trim());
+            const imageAlt = pkg.seoAltText || pkg.imageAlt || pkg.overlayTitle;
+            const description = pkg.excerpt || pkg.bottomDescription;
 
             return (
               <article
                 key={pkg.id}
                 className="overflow-hidden rounded-sm border-4 border-[#465c12] bg-[#f7f2df] shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-slate-900"
+                itemScope
+                itemType="https://schema.org/TouristTrip"
               >
                 <div className="group relative aspect-square w-full overflow-hidden bg-zinc-900">
                   <img
                     src={resolveTourPackageImageUrl(pkg.imageWebpUrl)}
-                    alt={pkg.imageAlt || pkg.overlayTitle}
+                    alt={imageAlt}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                    itemProp="image"
                   />
 
                   <div className="absolute inset-0 bg-black/30 transition-colors duration-300 group-hover:bg-black/10" />
@@ -126,18 +114,38 @@ const TourPackagesGrid = () => {
                   </div>
                 </div>
 
-                <div className="flex min-h-[220px] flex-col px-4 py-5 text-center">
-                  <h3 className="text-base font-black leading-snug text-[#465c12] dark:text-emerald-300">
+                <div className="flex min-h-[250px] flex-col px-4 py-5 text-center">
+                  <h3
+                    className="text-base font-black leading-snug text-[#465c12] dark:text-emerald-300"
+                    itemProp="name"
+                  >
                     {pkg.bottomTitle}
                   </h3>
 
-                  {pkg.bottomDescription ? (
-                    <p className="mt-3 flex-1 text-sm leading-6 text-slate-700 dark:text-slate-300">
-                      {pkg.bottomDescription}
+                  {description ? (
+                    <p
+                      className="mt-3 flex-1 text-sm leading-6 text-slate-700 dark:text-slate-300"
+                      itemProp="description"
+                    >
+                      {description}
                     </p>
                   ) : (
                     <div className="flex-1" />
                   )}
+
+                  {pkg.location ? (
+                    <p className="mt-3 inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wide text-emerald-900 dark:text-emerald-300">
+                      <MapPin size={13} aria-hidden="true" />
+                      <span itemProp="touristType">{pkg.location}</span>
+                    </p>
+                  ) : null}
+
+                  {pkg.priceAmount ? (
+                    <meta itemProp="price" content={String(pkg.priceAmount)} />
+                  ) : null}
+                  {pkg.priceCurrency ? (
+                    <meta itemProp="priceCurrency" content={pkg.priceCurrency} />
+                  ) : null}
 
                   {hasButton && pkg.buttonLabel && pkg.buttonHref ? (
                     <TourPackageButton href={pkg.buttonHref} label={pkg.buttonLabel} />

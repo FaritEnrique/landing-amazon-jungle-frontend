@@ -20,10 +20,81 @@ export interface SeoKeyword {
   } | null;
 }
 
-export interface PublicSeoMetadata {
+export interface SeoHome {
+  id: string;
   title: string;
   description: string;
+  canonicalUrl: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImageUrl: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImageUrl: string | null;
+  robotsIndex: boolean;
+  robotsFollow: boolean;
+  focusKeyword: string | null;
+  secondaryKeywords: string | null;
+  shareMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SeoBusinessProfile {
+  id: string;
+  businessName: string;
+  legalName: string | null;
+  ruc: string | null;
+  description: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  address: string | null;
+  city: string | null;
+  region: string | null;
+  country: string | null;
+  latitude: string | null;
+  longitude: string | null;
+  logoUrl: string | null;
+  facebookUrl: string | null;
+  instagramUrl: string | null;
+  tiktokUrl: string | null;
+  youtubeUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SeoFaq {
+  id: string;
+  question: string;
+  answer: string;
+  position: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: {
+    id: string;
+    fullName: string;
+    email: string;
+  } | null;
+  updatedBy?: {
+    id: string;
+    fullName: string;
+    email: string;
+  } | null;
+}
+
+export interface PublicSeoMetadata extends SeoHome {
   keywords: string[];
+  business: SeoBusinessProfile;
+  faqs: SeoFaq[];
+}
+
+export interface LandingSeoData {
+  metadata: PublicSeoMetadata;
+  home: SeoHome;
+  business: SeoBusinessProfile;
+  faqs: SeoFaq[];
 }
 
 export interface SeoKeywordPayload {
@@ -32,6 +103,13 @@ export interface SeoKeywordPayload {
   notes?: string | null;
   isActive?: boolean;
 }
+
+export type SeoHomePayload = Omit<SeoHome, "id" | "createdAt" | "updatedAt">;
+export type SeoBusinessProfilePayload = Omit<
+  SeoBusinessProfile,
+  "id" | "createdAt" | "updatedAt"
+>;
+export type SeoFaqPayload = Pick<SeoFaq, "question" | "answer" | "position" | "isActive">;
 
 const parseApiResponse = async <T>(response: Response): Promise<T> => {
   const data = await response.json().catch(() => null);
@@ -46,12 +124,153 @@ const parseApiResponse = async <T>(response: Response): Promise<T> => {
 export const getPublicSeoMetadata = async () => {
   const response = await fetch(`${API_URL}/api/seo/meta`, {
     method: "GET",
-    cache: "no-store",
+    next: {
+      revalidate: 300,
+    },
   });
 
   return parseApiResponse<{
     ok: boolean;
     data: PublicSeoMetadata;
+  }>(response);
+};
+
+export const getPublicLandingSeo = async () => {
+  const response = await fetch(`${API_URL}/api/seo/landing`, {
+    method: "GET",
+    next: {
+      revalidate: 300,
+    },
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    data: LandingSeoData;
+  }>(response);
+};
+
+export const getSeoHome = async () => {
+  const response = await fetch(`${API_URL}/api/seo/home`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    data: SeoHome;
+  }>(response);
+};
+
+export const updateSeoHome = async (payload: SeoHomePayload) => {
+  const response = await fetch(`${API_URL}/api/seo/home`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    data: SeoHome;
+  }>(response);
+};
+
+export const getSeoBusinessProfile = async () => {
+  const response = await fetch(`${API_URL}/api/seo/business-profile`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    data: SeoBusinessProfile;
+  }>(response);
+};
+
+export const updateSeoBusinessProfile = async (
+  payload: SeoBusinessProfilePayload,
+) => {
+  const response = await fetch(`${API_URL}/api/seo/business-profile`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    data: SeoBusinessProfile;
+  }>(response);
+};
+
+export const listSeoFaqs = async (includeInactive = true) => {
+  const response = await fetch(
+    `${API_URL}/api/seo/faqs?includeInactive=${includeInactive}`,
+    {
+      method: "GET",
+      credentials: "include",
+      cache: "no-store",
+    },
+  );
+
+  return parseApiResponse<{
+    ok: boolean;
+    total: number;
+    faqs: SeoFaq[];
+  }>(response);
+};
+
+export const createSeoFaq = async (payload: SeoFaqPayload) => {
+  const response = await fetch(`${API_URL}/api/seo/faqs`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    faq: SeoFaq;
+  }>(response);
+};
+
+export const updateSeoFaq = async (id: string, payload: SeoFaqPayload) => {
+  const response = await fetch(`${API_URL}/api/seo/faqs/${id}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    faq: SeoFaq;
+  }>(response);
+};
+
+export const deleteSeoFaq = async (id: string) => {
+  const response = await fetch(`${API_URL}/api/seo/faqs/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
   }>(response);
 };
 

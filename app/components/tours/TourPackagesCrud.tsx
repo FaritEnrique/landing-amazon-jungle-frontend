@@ -42,6 +42,16 @@ interface TourPackageFormState {
   bottomDescription: string;
   buttonLabel: string;
   buttonHref: string;
+  excerpt: string;
+  longDescription: string;
+  durationDays: number | "";
+  durationNights: number | "";
+  location: string;
+  meetingPoint: string;
+  priceCurrency: string;
+  priceAmount: number | "";
+  seoAltText: string;
+  isFeatured: boolean;
   active: boolean;
   sortOrder: number;
 }
@@ -56,6 +66,16 @@ const emptyForm: TourPackageFormState = {
   bottomDescription: "",
   buttonLabel: "View tour",
   buttonHref: "#contact",
+  excerpt: "",
+  longDescription: "",
+  durationDays: "",
+  durationNights: "",
+  location: "Iquitos, Loreto",
+  meetingPoint: "",
+  priceCurrency: "USD",
+  priceAmount: "",
+  seoAltText: "",
+  isFeatured: false,
   active: true,
   sortOrder: 0,
 };
@@ -83,6 +103,16 @@ const buildFormFromPackage = (pkg: TourPackage): TourPackageFormState => {
     bottomDescription: pkg.bottomDescription || "",
     buttonLabel: pkg.buttonLabel || "",
     buttonHref: pkg.buttonHref || "",
+    excerpt: pkg.excerpt || "",
+    longDescription: pkg.longDescription || "",
+    durationDays: pkg.durationDays ?? "",
+    durationNights: pkg.durationNights ?? "",
+    location: pkg.location || "",
+    meetingPoint: pkg.meetingPoint || "",
+    priceCurrency: pkg.priceCurrency || "USD",
+    priceAmount: pkg.priceAmount ? Number(pkg.priceAmount) : "",
+    seoAltText: pkg.seoAltText || "",
+    isFeatured: Boolean(pkg.isFeatured),
     active: pkg.active,
     sortOrder: pkg.sortOrder,
   };
@@ -99,6 +129,16 @@ const buildPayloadFromForm = (formData: TourPackageFormState): TourPackagePayloa
     bottomDescription: formData.bottomDescription.trim() || null,
     buttonLabel: formData.buttonLabel.trim() || null,
     buttonHref: formData.buttonHref.trim() || null,
+    excerpt: formData.excerpt.trim() || null,
+    longDescription: formData.longDescription.trim() || null,
+    durationDays: formData.durationDays === "" ? null : Number(formData.durationDays),
+    durationNights: formData.durationNights === "" ? null : Number(formData.durationNights),
+    location: formData.location.trim() || null,
+    meetingPoint: formData.meetingPoint.trim() || null,
+    priceCurrency: formData.priceCurrency.trim() || "USD",
+    priceAmount: formData.priceAmount === "" ? null : Number(formData.priceAmount),
+    seoAltText: formData.seoAltText.trim() || null,
+    isFeatured: formData.isFeatured,
     active: formData.active,
     sortOrder: Number.isFinite(Number(formData.sortOrder))
       ? Number(formData.sortOrder)
@@ -120,6 +160,16 @@ const buildPayloadFromPackage = (
     bottomDescription: pkg.bottomDescription || null,
     buttonLabel: pkg.buttonLabel || null,
     buttonHref: pkg.buttonHref || null,
+    excerpt: pkg.excerpt || null,
+    longDescription: pkg.longDescription || null,
+    durationDays: pkg.durationDays ?? null,
+    durationNights: pkg.durationNights ?? null,
+    location: pkg.location || null,
+    meetingPoint: pkg.meetingPoint || null,
+    priceCurrency: pkg.priceCurrency || "USD",
+    priceAmount: pkg.priceAmount ? Number(pkg.priceAmount) : null,
+    seoAltText: pkg.seoAltText || null,
+    isFeatured: Boolean(pkg.isFeatured),
     active: pkg.active,
     sortOrder: pkg.sortOrder,
     ...overrides,
@@ -558,6 +608,135 @@ const TourPackagesCrud = () => {
                 />
               </div>
 
+              <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                <h3 className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+                  SEO visible del paquete
+                </h3>
+
+                <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Resumen corto para la card
+                </label>
+                <textarea
+                  value={formData.excerpt}
+                  onChange={(event) => setField("excerpt", event.target.value)}
+                  rows={3}
+                  placeholder="Texto breve con palabras naturales: tour en Iquitos, Amazonía peruana, naturaleza, cultura..."
+                  className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                />
+
+                <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Descripción larga interna
+                </label>
+                <textarea
+                  value={formData.longDescription}
+                  onChange={(event) => setField("longDescription", event.target.value)}
+                  rows={4}
+                  placeholder="Contenido más completo para JSON-LD y futuras mejoras sin crear nuevas páginas visibles."
+                  className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                />
+
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Días
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={formData.durationDays}
+                      onChange={(event) =>
+                        setField(
+                          "durationDays",
+                          event.target.value === "" ? "" : Number(event.target.value),
+                        )
+                      }
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Noches
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={formData.durationNights}
+                      onChange={(event) =>
+                        setField(
+                          "durationNights",
+                          event.target.value === "" ? "" : Number(event.target.value),
+                        )
+                      }
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                    />
+                  </label>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Moneda SEO
+                    </span>
+                    <input
+                      value={formData.priceCurrency}
+                      onChange={(event) => setField("priceCurrency", event.target.value.toUpperCase())}
+                      placeholder="USD o PEN"
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Precio numérico SEO
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={formData.priceAmount}
+                      onChange={(event) =>
+                        setField(
+                          "priceAmount",
+                          event.target.value === "" ? "" : Number(event.target.value),
+                        )
+                      }
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                    />
+                  </label>
+                </div>
+
+                <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Ubicación / experiencia
+                </label>
+                <input
+                  value={formData.location}
+                  onChange={(event) => setField("location", event.target.value)}
+                  placeholder="Ej. Iquitos, Loreto, Amazonía peruana"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                />
+
+                <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Punto de encuentro
+                </label>
+                <input
+                  value={formData.meetingPoint}
+                  onChange={(event) => setField("meetingPoint", event.target.value)}
+                  placeholder="Ej. Puerto de Iquitos / Hotel del cliente"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                />
+
+                <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Alt SEO preferente
+                </label>
+                <input
+                  value={formData.seoAltText}
+                  onChange={(event) => setField("seoAltText", event.target.value)}
+                  placeholder="Ej. Tour de aventura en la Amazonía peruana desde Iquitos"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                />
+              </div>
+
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="flex items-center gap-3 rounded-2xl border border-slate-200 p-4 text-sm font-bold dark:border-slate-800">
                   <input
@@ -569,7 +748,17 @@ const TourPackagesCrud = () => {
                   Mostrar en landing
                 </label>
 
-                <label className="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                <label className="flex items-center gap-3 rounded-2xl border border-slate-200 p-4 text-sm font-bold dark:border-slate-800">
+                  <input
+                    type="checkbox"
+                    checked={formData.isFeatured}
+                    onChange={(event) => setField("isFeatured", event.target.checked)}
+                    className="h-4 w-4 accent-emerald-800"
+                  />
+                  Destacar para SEO
+                </label>
+
+                <label className="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800 sm:col-span-2">
                   <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Orden
                   </span>

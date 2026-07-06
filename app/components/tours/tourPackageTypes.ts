@@ -14,6 +14,17 @@ export interface TourPackage {
   buttonLabel?: string | null;
   buttonHref?: string | null;
 
+  excerpt?: string | null;
+  longDescription?: string | null;
+  durationDays?: number | null;
+  durationNights?: number | null;
+  location?: string | null;
+  meetingPoint?: string | null;
+  priceCurrency?: string | null;
+  priceAmount?: string | number | null;
+  seoAltText?: string | null;
+  isFeatured?: boolean;
+
   active: boolean;
   sortOrder: number;
 

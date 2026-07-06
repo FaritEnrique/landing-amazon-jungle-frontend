@@ -49,6 +49,34 @@ const fallbackSeoMetadata = {
     "excursiones en la selva",
     "Amazonas Perú",
   ],
+  canonicalUrl: null as string | null,
+  ogTitle: null as string | null,
+  ogDescription: null as string | null,
+  ogImageUrl: null as string | null,
+  twitterTitle: null as string | null,
+  twitterDescription: null as string | null,
+  twitterImageUrl: null as string | null,
+  robotsIndex: true,
+  robotsFollow: true,
+  businessName: "Amazon Jungle Expeditions",
+};
+
+const resolveAbsoluteUrl = (url?: string | null) => {
+  if (!url) return undefined;
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  if (url.startsWith("/uploads/")) {
+    return `${API_URL}${url}`;
+  }
+
+  if (url.startsWith("/")) {
+    return `${SITE_URL}${url}`;
+  }
+
+  return url;
 };
 
 const getSeoMetadata = async () => {
@@ -69,6 +97,18 @@ const getSeoMetadata = async () => {
         title?: string;
         description?: string;
         keywords?: string[];
+        canonicalUrl?: string | null;
+        ogTitle?: string | null;
+        ogDescription?: string | null;
+        ogImageUrl?: string | null;
+        twitterTitle?: string | null;
+        twitterDescription?: string | null;
+        twitterImageUrl?: string | null;
+        robotsIndex?: boolean;
+        robotsFollow?: boolean;
+        business?: {
+          businessName?: string;
+        };
       };
     };
 
@@ -79,6 +119,17 @@ const getSeoMetadata = async () => {
         data.data?.keywords && data.data.keywords.length > 0
           ? data.data.keywords
           : fallbackSeoMetadata.keywords,
+      canonicalUrl: data.data?.canonicalUrl || fallbackSeoMetadata.canonicalUrl,
+      ogTitle: data.data?.ogTitle || fallbackSeoMetadata.ogTitle,
+      ogDescription: data.data?.ogDescription || fallbackSeoMetadata.ogDescription,
+      ogImageUrl: data.data?.ogImageUrl || fallbackSeoMetadata.ogImageUrl,
+      twitterTitle: data.data?.twitterTitle || fallbackSeoMetadata.twitterTitle,
+      twitterDescription:
+        data.data?.twitterDescription || fallbackSeoMetadata.twitterDescription,
+      twitterImageUrl: data.data?.twitterImageUrl || fallbackSeoMetadata.twitterImageUrl,
+      robotsIndex: data.data?.robotsIndex ?? fallbackSeoMetadata.robotsIndex,
+      robotsFollow: data.data?.robotsFollow ?? fallbackSeoMetadata.robotsFollow,
+      businessName: data.data?.business?.businessName || "Amazon Jungle Expeditions",
     };
   } catch {
     return fallbackSeoMetadata;
@@ -88,26 +139,46 @@ const getSeoMetadata = async () => {
 export const generateMetadata = async (): Promise<Metadata> => {
   const seo = await getSeoMetadata();
 
+  const ogImage = resolveAbsoluteUrl(seo.ogImageUrl);
+  const twitterImage = resolveAbsoluteUrl(seo.twitterImageUrl || seo.ogImageUrl);
+  const canonicalUrl = seo.canonicalUrl || SITE_URL;
+
   return {
     metadataBase: new URL(SITE_URL),
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords,
     alternates: {
-      canonical: "/",
+      canonical: canonicalUrl,
     },
     openGraph: {
-      title: seo.title,
-      description: seo.description,
-      url: SITE_URL,
-      siteName: "Amazon Jungle Expeditions",
+      title: seo.ogTitle || seo.title,
+      description: seo.ogDescription || seo.description,
+      url: canonicalUrl,
+      siteName: seo.businessName || "Amazon Jungle Expeditions",
       locale: "es_PE",
       type: "website",
+      images: ogImage
+        ? [
+            {
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              alt: seo.ogTitle || seo.title,
+            },
+          ]
+        : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
-      description: seo.description,
+      title: seo.twitterTitle || seo.ogTitle || seo.title,
+      description:
+        seo.twitterDescription || seo.ogDescription || seo.description,
+      images: twitterImage ? [twitterImage] : undefined,
+    },
+    robots: {
+      index: seo.robotsIndex,
+      follow: seo.robotsFollow,
     },
   };
 };

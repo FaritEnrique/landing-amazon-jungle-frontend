@@ -3,56 +3,170 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Pencil, Plus, RefreshCw, Save, Trash2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  Eye,
+  HelpCircle,
+  KeyRound,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Save,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { getMe } from "@/lib/authApi";
 import {
+  createSeoFaq,
   createSeoKeyword,
+  deleteSeoFaq,
   deleteSeoKeyword,
+  getSeoBusinessProfile,
+  getSeoHome,
+  listSeoFaqs,
   listSeoKeywords,
+  updateSeoBusinessProfile,
+  updateSeoFaq,
+  updateSeoHome,
   updateSeoKeyword,
+  type SeoBusinessProfilePayload,
+  type SeoFaq,
+  type SeoHomePayload,
   type SeoKeyword,
 } from "@/lib/seoApi";
 
-const emptyForm = {
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.amazonjungle-expeditions.com";
+
+type ActiveSection = "landing" | "business" | "faqs" | "keywords";
+
+const emptyHomeForm: SeoHomePayload = {
+  title: "Amazon Jungle Expeditions | Albergue y tours en la Amazonía peruana",
+  description:
+    "Experiencias auténticas en la Amazonía peruana: albergue, excursiones, naturaleza, cultura viva y aventura en Iquitos.",
+  canonicalUrl: "",
+  ogTitle: "",
+  ogDescription: "",
+  ogImageUrl: "",
+  twitterTitle: "",
+  twitterDescription: "",
+  twitterImageUrl: "",
+  robotsIndex: true,
+  robotsFollow: true,
+  focusKeyword: "tours en Iquitos",
+  secondaryKeywords:
+    "albergue en Iquitos, Amazonía peruana, excursiones en la selva, Amazon tours Peru",
+  shareMessage:
+    "Descubre Amazon Jungle Expeditions: albergue y tours auténticos en la Amazonía peruana desde Iquitos.",
+};
+
+const emptyBusinessForm: SeoBusinessProfilePayload = {
+  businessName: "Amazon Jungle Expeditions",
+  legalName: "",
+  ruc: "",
+  description: "Albergue y experiencias turísticas en la Amazonía peruana desde Iquitos.",
+  phone: "+51 943214093",
+  whatsapp: "51943214093",
+  email: "",
+  address: "",
+  city: "Iquitos",
+  region: "Loreto",
+  country: "PE",
+  latitude: "",
+  longitude: "",
+  logoUrl: "/images/logos/Logo-sbg.webp",
+  facebookUrl: "",
+  instagramUrl: "",
+  tiktokUrl: "",
+  youtubeUrl: "",
+};
+
+const emptyFaqForm = {
+  question: "",
+  answer: "",
+  position: 0,
+  isActive: true,
+};
+
+const emptyKeywordForm = {
   phrase: "",
   source: "",
   notes: "",
   isActive: true,
 };
 
+const normalizeNullableForm = <T extends object>(form: T): T => {
+  return Object.fromEntries(
+    Object.entries(form as Record<string, unknown>).map(([key, value]) => [
+      key,
+      typeof value === "string" && value.trim() === "" ? null : value,
+    ]),
+  ) as T;
+};
+
+const getLengthState = (value: string, min: number, max: number) => {
+  const length = value.trim().length;
+
+  if (length < min) return "text-amber-700 dark:text-amber-300";
+  if (length > max) return "text-red-600 dark:text-red-400";
+
+  return "text-emerald-700 dark:text-emerald-400";
+};
+
+const FieldHelp = ({ value, min, max }: { value: string; min: number; max: number }) => {
+  return (
+    <p className={`mt-1 text-[10px] font-bold ${getLengthState(value, min, max)}`}>
+      {value.trim().length} caracteres. Recomendado: {min}-{max}.
+    </p>
+  );
+};
+
 const SeoKeywordsPage = () => {
   const router = useRouter();
 
+  const [activeSection, setActiveSection] = useState<ActiveSection>("landing");
+  const [homeForm, setHomeForm] = useState<SeoHomePayload>(emptyHomeForm);
+  const [businessForm, setBusinessForm] =
+    useState<SeoBusinessProfilePayload>(emptyBusinessForm);
+  const [faqs, setFaqs] = useState<SeoFaq[]>([]);
+  const [faqForm, setFaqForm] = useState(emptyFaqForm);
+  const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
   const [keywords, setKeywords] = useState<SeoKeyword[]>([]);
-  const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState("");
-  const [formData, setFormData] = useState(emptyForm);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [keywordSearch, setKeywordSearch] = useState("");
+  const [keywordForm, setKeywordForm] = useState(emptyKeywordForm);
+  const [editingKeywordId, setEditingKeywordId] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const activeCount = useMemo(() => {
-    return keywords.filter((keyword) => keyword.isActive).length;
-  }, [keywords]);
+  const activeKeywords = useMemo(
+    () => keywords.filter((keyword) => keyword.isActive).length,
+    [keywords],
+  );
 
-  const loadKeywords = async (q = search) => {
+  const activeFaqs = useMemo(() => faqs.filter((faq) => faq.isActive).length, [faqs]);
+
+  const loadSeoData = async (q = keywordSearch) => {
     setIsLoading(true);
 
     try {
-      const response = await listSeoKeywords({
-        q,
-        includeInactive: true,
-      });
+      const [home, business, faqResponse, keywordResponse] = await Promise.all([
+        getSeoHome(),
+        getSeoBusinessProfile(),
+        listSeoFaqs(true),
+        listSeoKeywords({ q, includeInactive: true }),
+      ]);
 
-      setKeywords(response.keywords);
-      setTotal(response.total);
+      setHomeForm({ ...emptyHomeForm, ...normalizeNullableForm(home.data) });
+      setBusinessForm({ ...emptyBusinessForm, ...normalizeNullableForm(business.data) });
+      setFaqs(faqResponse.faqs);
+      setKeywords(keywordResponse.keywords);
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : "No se pudo cargar las palabras clave";
+        error instanceof Error ? error.message : "No se pudo cargar la configuración SEO";
 
       toast.error(message);
     } finally {
@@ -67,7 +181,7 @@ const SeoKeywordsPage = () => {
       .then(() => {
         if (!isMounted) return;
         setIsChecking(false);
-        void loadKeywords("");
+        void loadSeoData("");
       })
       .catch(() => {
         if (!isMounted) return;
@@ -80,44 +194,24 @@ const SeoKeywordsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
-  const resetForm = () => {
-    setFormData(emptyForm);
-    setEditingId(null);
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSaveHome = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!formData.phrase.trim()) {
-      toast.error("Ingrese una palabra o frase clave");
+    if (!homeForm.title.trim() || !homeForm.description.trim()) {
+      toast.error("Ingrese título SEO y descripción SEO de la landing");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const payload = {
-        phrase: formData.phrase,
-        source: formData.source || null,
-        notes: formData.notes || null,
-        isActive: formData.isActive,
-      };
-
-      if (editingId) {
-        await updateSeoKeyword(editingId, payload);
-        toast.success("Palabra o frase clave actualizada");
-      } else {
-        await createSeoKeyword(payload);
-        toast.success("Palabra o frase clave registrada");
-      }
-
-      resetForm();
-      await loadKeywords();
+      const payload = normalizeNullableForm(homeForm) as SeoHomePayload;
+      await updateSeoHome(payload);
+      toast.success("SEO de la landing actualizado correctamente");
+      await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : "No se pudo guardar la palabra o frase clave";
+        error instanceof Error ? error.message : "No se pudo actualizar el SEO de la landing";
 
       toast.error(message);
     } finally {
@@ -125,9 +219,140 @@ const SeoKeywordsPage = () => {
     }
   };
 
-  const handleEdit = (keyword: SeoKeyword) => {
-    setEditingId(keyword.id);
-    setFormData({
+  const handleSaveBusiness = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!businessForm.businessName.trim()) {
+      toast.error("Ingrese el nombre comercial del negocio");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = normalizeNullableForm(businessForm) as SeoBusinessProfilePayload;
+      await updateSeoBusinessProfile(payload);
+      toast.success("Perfil del negocio actualizado correctamente");
+      await loadSeoData();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "No se pudo actualizar el perfil del negocio";
+
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetFaqForm = () => {
+    setFaqForm(emptyFaqForm);
+    setEditingFaqId(null);
+  };
+
+  const handleSaveFaq = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!faqForm.question.trim() || !faqForm.answer.trim()) {
+      toast.error("Ingrese la pregunta y la respuesta");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (editingFaqId) {
+        await updateSeoFaq(editingFaqId, faqForm);
+        toast.success("Pregunta frecuente actualizada");
+      } else {
+        await createSeoFaq(faqForm);
+        toast.success("Pregunta frecuente registrada");
+      }
+
+      resetFaqForm();
+      await loadSeoData();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "No se pudo guardar la pregunta frecuente";
+
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditFaq = (faq: SeoFaq) => {
+    setEditingFaqId(faq.id);
+    setFaqForm({
+      question: faq.question,
+      answer: faq.answer,
+      position: faq.position,
+      isActive: faq.isActive,
+    });
+  };
+
+  const handleDeleteFaq = async (faq: SeoFaq) => {
+    if (!window.confirm(`¿Eliminar la pregunta "${faq.question}"?`)) {
+      return;
+    }
+
+    try {
+      await deleteSeoFaq(faq.id);
+      toast.success("Pregunta frecuente eliminada");
+      await loadSeoData();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "No se pudo eliminar la pregunta frecuente";
+
+      toast.error(message);
+    }
+  };
+
+  const resetKeywordForm = () => {
+    setKeywordForm(emptyKeywordForm);
+    setEditingKeywordId(null);
+  };
+
+  const handleSaveKeyword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!keywordForm.phrase.trim()) {
+      toast.error("Ingrese una palabra o frase objetivo");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        phrase: keywordForm.phrase.trim(),
+        source: keywordForm.source.trim() || null,
+        notes: keywordForm.notes.trim() || null,
+        isActive: keywordForm.isActive,
+      };
+
+      if (editingKeywordId) {
+        await updateSeoKeyword(editingKeywordId, payload);
+        toast.success("Frase objetivo actualizada");
+      } else {
+        await createSeoKeyword(payload);
+        toast.success("Frase objetivo registrada");
+      }
+
+      resetKeywordForm();
+      await loadSeoData();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "No se pudo guardar la frase objetivo";
+
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditKeyword = (keyword: SeoKeyword) => {
+    setEditingKeywordId(keyword.id);
+    setKeywordForm({
       phrase: keyword.phrase,
       source: keyword.source || "",
       notes: keyword.notes || "",
@@ -135,58 +360,26 @@ const SeoKeywordsPage = () => {
     });
   };
 
-  const handleDelete = async (keyword: SeoKeyword) => {
-    const shouldDelete = window.confirm(
-      `¿Eliminar la palabra o frase clave "${keyword.phrase}"?`
-    );
-
-    if (!shouldDelete) {
+  const handleDeleteKeyword = async (keyword: SeoKeyword) => {
+    if (!window.confirm(`¿Eliminar la frase "${keyword.phrase}"?`)) {
       return;
     }
 
     try {
       await deleteSeoKeyword(keyword.id);
-      toast.success("Palabra o frase clave eliminada");
-      await loadKeywords();
+      toast.success("Frase objetivo eliminada");
+      await loadSeoData();
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : "No se pudo eliminar la palabra o frase clave";
+        error instanceof Error ? error.message : "No se pudo eliminar la frase objetivo";
 
       toast.error(message);
     }
   };
 
-  const handleToggleStatus = async (keyword: SeoKeyword) => {
-    try {
-      await updateSeoKeyword(keyword.id, {
-        phrase: keyword.phrase,
-        source: keyword.source,
-        notes: keyword.notes,
-        isActive: !keyword.isActive,
-      });
-
-      toast.success(
-        !keyword.isActive
-          ? "Palabra o frase clave activada"
-          : "Palabra o frase clave desactivada"
-      );
-
-      await loadKeywords();
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "No se pudo cambiar el estado";
-
-      toast.error(message);
-    }
-  };
-
-  const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleKeywordSearch = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await loadKeywords(search);
+    await loadSeoData(keywordSearch);
   };
 
   if (isChecking) {
@@ -202,274 +395,486 @@ const SeoKeywordsPage = () => {
     );
   }
 
+  const sections = [
+    { id: "landing" as const, label: "Landing", icon: Eye },
+    { id: "business" as const, label: "Negocio", icon: Building2 },
+    { id: "faqs" as const, label: "FAQs", icon: HelpCircle },
+    { id: "keywords" as const, label: "Frases", icon: KeyRound },
+  ];
+
   return (
     <div className="min-h-[70vh] bg-slate-50 px-4 py-8 dark:bg-slate-950 sm:py-10">
       <div className="mx-auto max-w-7xl space-y-6">
-        <div className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <Link
-              href="/dashboard"
-              className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-[11px] font-black uppercase tracking-wide text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800 dark:text-slate-400 dark:hover:text-emerald-400"
-            >
-              <ArrowLeft size={14} />
-              Volver al dashboard
-            </Link>
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+          <Link
+            href="/dashboard"
+            className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-[11px] font-black uppercase tracking-wide text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800 dark:text-slate-400 dark:hover:text-emerald-400"
+          >
+            <ArrowLeft size={14} />
+            Volver al dashboard
+          </Link>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-400">
-              SEO dinámico
-            </div>
+          <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-400">
+                SEO dinámico de una sola landing
+              </div>
 
-            <h1 className="mt-3 text-2xl font-black uppercase tracking-tight text-emerald-950 dark:text-emerald-400 sm:text-3xl">
-              Palabras y frases clave
-            </h1>
+              <h1 className="mt-3 text-2xl font-black uppercase tracking-tight text-emerald-950 dark:text-emerald-400 sm:text-3xl">
+                SEO de la página principal
+              </h1>
 
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-              Registre las palabras, frases y formas reales en que los clientes
-              dicen haber encontrado el albergue. Las frases activas alimentan
-              las metas SEO públicas de la landing.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:min-w-64">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                Total
-              </p>
-              <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">
-                {total}
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                Administra metadata, Open Graph, datos del negocio, preguntas frecuentes y frases objetivo. Todo se aplica a la única página pública <strong>/</strong>.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                Activas
-              </p>
-              <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-400">
-                {activeCount}
-              </p>
+            <div className="grid grid-cols-3 gap-3 sm:min-w-96">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  FAQs activas
+                </p>
+                <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">
+                  {activeFaqs}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  Frases activas
+                </p>
+                <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-400">
+                  {activeKeywords}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => void loadSeoData()}
+                disabled={isLoading}
+                className="rounded-2xl border border-emerald-700 px-4 py-3 text-xs font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+              >
+                <RefreshCw size={16} className={`mx-auto mb-1 ${isLoading ? "animate-spin" : ""}`} />
+                Recargar
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
-          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-            <div className="mb-5 flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
-                  {editingId ? "Editar frase" : "Nueva frase"}
-                </h2>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                  No hay límite de registros. Use frases naturales, tal como las
-                  mencione el cliente.
-                </p>
-              </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {sections.map((section) => {
+            const Icon = section.icon;
+            const isActive = activeSection === section.id;
 
-              {editingId && (
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:text-red-600 dark:border-slate-800"
-                  aria-label="Cancelar edición"
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
+            return (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => setActiveSection(section.id)}
+                className={`rounded-2xl border px-4 py-3 text-xs font-black uppercase tracking-wider transition ${
+                  isActive
+                    ? "border-emerald-700 bg-emerald-800 text-white shadow-lg"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                }`}
+              >
+                <Icon size={16} className="mx-auto mb-1" />
+                {section.label}
+              </button>
+            );
+          })}
+        </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="seo-phrase"
-                  className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400"
-                >
-                  Palabra o frase clave
-                </label>
+        {activeSection === "landing" ? (
+          <form onSubmit={handleSaveHome} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+              <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                Metadata principal
+              </h2>
 
-                <textarea
-                  id="seo-phrase"
-                  name="phrase"
-                  required
-                  rows={3}
-                  placeholder="Ej. tours privados en la selva de Iquitos"
-                  className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-emerald-500"
-                  value={formData.phrase}
-                  onChange={(event) =>
-                    setFormData({ ...formData, phrase: event.target.value })
-                  }
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="seo-source"
-                  className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400"
-                >
-                  Fuente o contexto
-                </label>
-
-                <input
-                  id="seo-source"
-                  name="source"
-                  type="text"
-                  placeholder="Ej. Entrevista a cliente, WhatsApp, Google, recomendación"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-emerald-500"
-                  value={formData.source}
-                  onChange={(event) =>
-                    setFormData({ ...formData, source: event.target.value })
-                  }
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="seo-notes"
-                  className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400"
-                >
-                  Notas internas
-                </label>
-
-                <textarea
-                  id="seo-notes"
-                  name="notes"
-                  rows={3}
-                  placeholder="Ej. Cliente indicó que buscó paquetes de 3 días y 2 noches"
-                  className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-emerald-500"
-                  value={formData.notes}
-                  onChange={(event) =>
-                    setFormData({ ...formData, notes: event.target.value })
-                  }
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <label className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
-                <span>Usar en metadata SEO pública</span>
-                <input
-                  type="checkbox"
-                  checked={formData.isActive}
-                  onChange={(event) =>
-                    setFormData({ ...formData, isActive: event.target.checked })
-                  }
-                  disabled={isSubmitting}
-                  className="h-4 w-4 accent-emerald-700"
-                />
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Título SEO
               </label>
+              <input
+                aria-label="Título SEO"
+                value={homeForm.title}
+                onChange={(event) => setHomeForm({ ...homeForm, title: event.target.value })}
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+              <FieldHelp value={homeForm.title} min={45} max={65} />
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Meta description
+              </label>
+              <textarea
+                aria-label="Meta description"
+                value={homeForm.description}
+                onChange={(event) => setHomeForm({ ...homeForm, description: event.target.value })}
+                rows={4}
+                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+              <FieldHelp value={homeForm.description} min={120} max={160} />
+
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Canonical URL
+                  </span>
+                  <input
+                    value={homeForm.canonicalUrl || ""}
+                    onChange={(event) => setHomeForm({ ...homeForm, canonicalUrl: event.target.value })}
+                    placeholder={SITE_URL}
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Imagen OG / WhatsApp
+                  </span>
+                  <input
+                    value={homeForm.ogImageUrl || ""}
+                    onChange={(event) => setHomeForm({ ...homeForm, ogImageUrl: event.target.value })}
+                    placeholder="/images/logos/Logo-sbg.webp o URL absoluta"
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    OG title
+                  </span>
+                  <input
+                    value={homeForm.ogTitle || ""}
+                    onChange={(event) => setHomeForm({ ...homeForm, ogTitle: event.target.value })}
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Twitter image
+                  </span>
+                  <input
+                    value={homeForm.twitterImageUrl || ""}
+                    onChange={(event) => setHomeForm({ ...homeForm, twitterImageUrl: event.target.value })}
+                    placeholder="Vacío usa la imagen OG"
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+              </div>
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                OG description
+              </label>
+              <textarea
+                aria-label="OG description"
+                value={homeForm.ogDescription || ""}
+                onChange={(event) => setHomeForm({ ...homeForm, ogDescription: event.target.value })}
+                rows={3}
+                placeholder="Vacío usa la meta description"
+                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Mensaje de compartir
+              </label>
+              <textarea
+                aria-label="Mensaje de compartir"
+                value={homeForm.shareMessage || ""}
+                onChange={(event) => setHomeForm({ ...homeForm, shareMessage: event.target.value })}
+                rows={3}
+                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Frase principal
+                  </span>
+                  <input
+                    value={homeForm.focusKeyword || ""}
+                    onChange={(event) => setHomeForm({ ...homeForm, focusKeyword: event.target.value })}
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Frases secundarias
+                  </span>
+                  <input
+                    value={homeForm.secondaryKeywords || ""}
+                    onChange={(event) => setHomeForm({ ...homeForm, secondaryKeywords: event.target.value })}
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-bold dark:border-slate-800 dark:bg-slate-950">
+                  <input
+                    type="checkbox"
+                    checked={homeForm.robotsIndex}
+                    onChange={(event) => setHomeForm({ ...homeForm, robotsIndex: event.target.checked })}
+                    className="h-4 w-4 accent-emerald-700"
+                  />
+                  Indexar landing pública
+                </label>
+
+                <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-bold dark:border-slate-800 dark:bg-slate-950">
+                  <input
+                    type="checkbox"
+                    checked={homeForm.robotsFollow}
+                    onChange={(event) => setHomeForm({ ...homeForm, robotsFollow: event.target.checked })}
+                    className="h-4 w-4 accent-emerald-700"
+                  />
+                  Permitir follow
+                </label>
+              </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-800 py-3 text-xs font-black uppercase tracking-wider text-white shadow-md transition-colors hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
               >
-                {editingId ? <Save size={16} /> : <Plus size={16} />}
-                {isSubmitting
-                  ? "Guardando..."
-                  : editingId
-                    ? "Guardar cambios"
-                    : "Registrar frase clave"}
+                <Save size={16} />
+                {isSubmitting ? "Guardando..." : "Guardar SEO de landing"}
               </button>
-            </form>
-          </section>
+            </section>
 
-          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-            <form
-              onSubmit={handleSearchSubmit}
-              className="mb-5 flex flex-col gap-3 sm:flex-row"
+            <aside className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+              <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                Vista previa Google
+              </h2>
+
+              <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                <p className="truncate text-xs text-emerald-700 dark:text-emerald-400">
+                  {homeForm.canonicalUrl || SITE_URL}
+                </p>
+                <p className="mt-1 text-lg font-semibold leading-snug text-blue-700 dark:text-blue-400">
+                  {homeForm.title || "Título SEO"}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                  {homeForm.description || "Descripción SEO"}
+                </p>
+              </div>
+
+              <h2 className="mt-6 text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                Vista previa social
+              </h2>
+              <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
+                <div className="flex aspect-video items-center justify-center bg-emerald-950 text-center text-xs font-black uppercase tracking-wider text-white/60">
+                  {homeForm.ogImageUrl ? "Imagen OG configurada" : "Sin imagen OG"}
+                </div>
+                <div className="p-4">
+                  <p className="text-sm font-black text-slate-900 dark:text-white">
+                    {homeForm.ogTitle || homeForm.title}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                    {homeForm.ogDescription || homeForm.description}
+                  </p>
+                </div>
+              </div>
+            </aside>
+          </form>
+        ) : null}
+
+        {activeSection === "business" ? (
+          <form onSubmit={handleSaveBusiness} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+            <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+              Perfil del negocio para JSON-LD
+            </h2>
+
+            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {[
+                ["businessName", "Nombre comercial", "Amazon Jungle Expeditions"],
+                ["legalName", "Razón social", ""],
+                ["ruc", "RUC", ""],
+                ["phone", "Teléfono", "+51 943214093"],
+                ["whatsapp", "WhatsApp", "51943214093"],
+                ["email", "Correo", "reservas@dominio.com"],
+                ["address", "Dirección", ""],
+                ["city", "Ciudad", "Iquitos"],
+                ["region", "Región", "Loreto"],
+                ["country", "País", "PE"],
+                ["latitude", "Latitud", ""],
+                ["longitude", "Longitud", ""],
+                ["logoUrl", "Logo URL", "/images/logos/Logo-sbg.webp"],
+                ["facebookUrl", "Facebook", "https://facebook.com/..."],
+                ["instagramUrl", "Instagram", "https://instagram.com/..."],
+                ["tiktokUrl", "TikTok", "https://tiktok.com/@..."],
+                ["youtubeUrl", "YouTube", "https://youtube.com/..."],
+              ].map(([key, label, placeholder]) => (
+                <label key={key} className="block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    {label}
+                  </span>
+                  <input
+                    value={String(businessForm[key as keyof SeoBusinessProfilePayload] || "")}
+                    onChange={(event) =>
+                      setBusinessForm({
+                        ...businessForm,
+                        [key]: event.target.value,
+                      })
+                    }
+                    placeholder={placeholder}
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+              ))}
+            </div>
+
+            <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Descripción del negocio
+            </label>
+            <textarea
+              aria-label="Descripción del negocio"
+              value={businessForm.description || ""}
+              onChange={(event) => setBusinessForm({ ...businessForm, description: event.target.value })}
+              rows={4}
+              className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+            />
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
             >
-              <input
-                type="search"
-                placeholder="Buscar por palabra o frase..."
-                className="min-h-11 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-emerald-500"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
+              <Save size={16} />
+              {isSubmitting ? "Guardando..." : "Guardar perfil del negocio"}
+            </button>
+          </form>
+        ) : null}
+
+        {activeSection === "faqs" ? (
+          <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
+            <form onSubmit={handleSaveFaq} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                    {editingFaqId ? "Editar FAQ" : "Nueva FAQ"}
+                  </h2>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    Se muestra en la landing y alimenta FAQPage JSON-LD.
+                  </p>
+                </div>
+
+                {editingFaqId ? (
+                  <button
+                    type="button"
+                    onClick={resetFaqForm}
+                    className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:text-red-600 dark:border-slate-800"
+                    aria-label="Cancelar edición"
+                  >
+                    <X size={16} />
+                  </button>
+                ) : null}
+              </div>
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Pregunta
+              </label>
+              <textarea
+                aria-label="Pregunta frecuente"
+                value={faqForm.question}
+                onChange={(event) => setFaqForm({ ...faqForm, question: event.target.value })}
+                rows={3}
+                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Respuesta
+              </label>
+              <textarea
+                aria-label="Respuesta frecuente"
+                value={faqForm.answer}
+                onChange={(event) => setFaqForm({ ...faqForm, answer: event.target.value })}
+                rows={5}
+                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <label className="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                  <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Orden
+                  </span>
+                  <input
+                    type="number"
+                    value={faqForm.position}
+                    onChange={(event) => setFaqForm({ ...faqForm, position: Number(event.target.value) })}
+                    className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-emerald-700 dark:border-slate-800 dark:bg-slate-950"
+                  />
+                </label>
+
+                <label className="flex items-center gap-3 rounded-2xl border border-slate-200 p-4 text-sm font-bold dark:border-slate-800">
+                  <input
+                    type="checkbox"
+                    checked={faqForm.isActive}
+                    onChange={(event) => setFaqForm({ ...faqForm, isActive: event.target.checked })}
+                    className="h-4 w-4 accent-emerald-700"
+                  />
+                  Activa
+                </label>
+              </div>
 
               <button
                 type="submit"
-                disabled={isLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-700 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+                disabled={isSubmitting}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
               >
-                <RefreshCw size={15} className={isLoading ? "animate-spin" : ""} />
-                Buscar
+                {editingFaqId ? <Save size={16} /> : <Plus size={16} />}
+                {isSubmitting ? "Guardando..." : editingFaqId ? "Guardar FAQ" : "Registrar FAQ"}
               </button>
             </form>
 
-            {keywords.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center dark:border-slate-700">
-                <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
-                  Todavía no hay palabras o frases clave.
-                </p>
-                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                  Registre las primeras frases según las entrevistas y consultas
-                  reales de los clientes.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {keywords.map((keyword) => (
-                  <article
-                    key={keyword.id}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950"
-                  >
+            <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+              <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                Preguntas frecuentes registradas
+              </h2>
+
+              <div className="mt-5 space-y-3">
+                {faqs.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-400 dark:border-slate-700">
+                    No hay preguntas frecuentes registradas.
+                  </div>
+                ) : null}
+
+                {faqs.map((faq) => (
+                  <article key={faq.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${
-                              keyword.isActive
-                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400"
-                                : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                            }`}
-                          >
-                            {keyword.isActive ? "Activa" : "Inactiva"}
+                      <div>
+                        <div className="flex flex-wrap gap-2">
+                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${faq.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>
+                            {faq.isActive ? "Activa" : "Inactiva"}
                           </span>
-
-                          {keyword.source && (
-                            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-800 dark:bg-amber-950/40 dark:text-amber-400">
-                              {keyword.source}
-                            </span>
-                          )}
+                          <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-800">
+                            Orden {faq.position}
+                          </span>
                         </div>
-
-                        <h3 className="mt-3 wrap-break-word text-sm font-black text-slate-900 dark:text-white">
-                          {keyword.phrase}
+                        <h3 className="mt-3 text-sm font-black text-slate-900 dark:text-white">
+                          {faq.question}
                         </h3>
-
-                        {keyword.notes && (
-                          <p className="mt-2 wrap-break-word text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                            {keyword.notes}
-                          </p>
-                        )}
-
-                        <p className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                          Actualizado: {new Date(keyword.updatedAt).toLocaleDateString("es-PE")}
+                        <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                          {faq.answer}
                         </p>
                       </div>
 
-                      <div className="flex shrink-0 flex-wrap gap-2">
+                      <div className="flex shrink-0 gap-2">
                         <button
                           type="button"
-                          onClick={() => handleToggleStatus(keyword)}
-                          className="rounded-full border border-slate-200 px-3 py-2 text-[10px] font-black uppercase tracking-wide text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800 dark:text-slate-300"
-                        >
-                          {keyword.isActive ? "Desactivar" : "Activar"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(keyword)}
-                          className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800 dark:text-slate-300"
-                          aria-label="Editar palabra o frase clave"
+                          onClick={() => handleEditFaq(faq)}
+                          className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800"
+                          aria-label="Editar FAQ"
                         >
                           <Pencil size={15} />
                         </button>
-
                         <button
                           type="button"
-                          onClick={() => handleDelete(keyword)}
-                          className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/40 dark:hover:bg-red-950/30"
-                          aria-label="Eliminar palabra o frase clave"
+                          onClick={() => void handleDeleteFaq(faq)}
+                          className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/40"
+                          aria-label="Eliminar FAQ"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -478,9 +883,167 @@ const SeoKeywordsPage = () => {
                   </article>
                 ))}
               </div>
-            )}
-          </section>
-        </div>
+            </section>
+          </div>
+        ) : null}
+
+        {activeSection === "keywords" ? (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
+            <form onSubmit={handleSaveKeyword} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                    {editingKeywordId ? "Editar frase" : "Nueva frase"}
+                  </h2>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    Son apoyo editorial; el ranking depende del contenido visible y técnico.
+                  </p>
+                </div>
+
+                {editingKeywordId ? (
+                  <button
+                    type="button"
+                    onClick={resetKeywordForm}
+                    className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:text-red-600 dark:border-slate-800"
+                    aria-label="Cancelar edición"
+                  >
+                    <X size={16} />
+                  </button>
+                ) : null}
+              </div>
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Palabra o frase objetivo
+              </label>
+              <textarea
+                aria-label="Palabra o frase objetivo"
+                value={keywordForm.phrase}
+                onChange={(event) => setKeywordForm({ ...keywordForm, phrase: event.target.value })}
+                rows={3}
+                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Fuente
+              </label>
+              <input
+                aria-label="Fuente de la frase objetivo"
+                value={keywordForm.source}
+                onChange={(event) => setKeywordForm({ ...keywordForm, source: event.target.value })}
+                placeholder="WhatsApp, entrevista, Google, recomendación..."
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Notas internas
+              </label>
+              <textarea
+                aria-label="Notas internas de la frase objetivo"
+                value={keywordForm.notes}
+                onChange={(event) => setKeywordForm({ ...keywordForm, notes: event.target.value })}
+                rows={3}
+                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
+              />
+
+              <label className="mt-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-bold dark:border-slate-800 dark:bg-slate-950">
+                <input
+                  type="checkbox"
+                  checked={keywordForm.isActive}
+                  onChange={(event) => setKeywordForm({ ...keywordForm, isActive: event.target.checked })}
+                  className="h-4 w-4 accent-emerald-700"
+                />
+                Activa como frase objetivo
+              </label>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
+              >
+                {editingKeywordId ? <Save size={16} /> : <Plus size={16} />}
+                {isSubmitting ? "Guardando..." : editingKeywordId ? "Guardar frase" : "Registrar frase"}
+              </button>
+            </form>
+
+            <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+              <form onSubmit={handleKeywordSearch} className="mb-5 flex flex-col gap-3 sm:flex-row">
+                <input
+                  aria-label="Buscar frase objetivo"
+                  type="search"
+                  placeholder="Buscar frase objetivo..."
+                  value={keywordSearch}
+                  onChange={(event) => setKeywordSearch(event.target.value)}
+                  className="min-h-11 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                />
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-700 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400"
+                >
+                  <Search size={15} />
+                  Buscar
+                </button>
+              </form>
+
+              <div className="space-y-3">
+                {keywords.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-400 dark:border-slate-700">
+                    No hay frases objetivo registradas.
+                  </div>
+                ) : null}
+
+                {keywords.map((keyword) => (
+                  <article key={keyword.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${keyword.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>
+                            {keyword.isActive ? "Activa" : "Inactiva"}
+                          </span>
+                          {keyword.source ? (
+                            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-800">
+                              {keyword.source}
+                            </span>
+                          ) : null}
+                        </div>
+
+                        <h3 className="mt-3 break-words text-sm font-black text-slate-900 dark:text-white">
+                          {keyword.phrase}
+                        </h3>
+
+                        {keyword.notes ? (
+                          <p className="mt-2 break-words text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                            {keyword.notes}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="flex shrink-0 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEditKeyword(keyword)}
+                          className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800"
+                          aria-label="Editar frase"
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleDeleteKeyword(keyword)}
+                          className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/40"
+                          aria-label="Eliminar frase"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
+        ) : null}
       </div>
     </div>
   );

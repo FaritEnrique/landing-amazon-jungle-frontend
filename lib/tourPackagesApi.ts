@@ -23,6 +23,17 @@ export interface TourPackagePayload {
   buttonLabel?: string | null;
   buttonHref?: string | null;
 
+  excerpt?: string | null;
+  longDescription?: string | null;
+  durationDays?: number | null;
+  durationNights?: number | null;
+  location?: string | null;
+  meetingPoint?: string | null;
+  priceCurrency?: string | null;
+  priceAmount?: number | null;
+  seoAltText?: string | null;
+  isFeatured?: boolean;
+
   active: boolean;
   sortOrder: number;
 }
@@ -39,6 +50,17 @@ const buildFormData = (payload: TourPackagePayload) => {
   formData.append("bottomDescription", payload.bottomDescription || "");
   formData.append("buttonLabel", payload.buttonLabel || "");
   formData.append("buttonHref", payload.buttonHref || "");
+
+  formData.append("excerpt", payload.excerpt || "");
+  formData.append("longDescription", payload.longDescription || "");
+  formData.append("durationDays", payload.durationDays ? String(payload.durationDays) : "");
+  formData.append("durationNights", payload.durationNights ? String(payload.durationNights) : "");
+  formData.append("location", payload.location || "");
+  formData.append("meetingPoint", payload.meetingPoint || "");
+  formData.append("priceCurrency", payload.priceCurrency || "USD");
+  formData.append("priceAmount", payload.priceAmount ? String(payload.priceAmount) : "");
+  formData.append("seoAltText", payload.seoAltText || "");
+  formData.append("isFeatured", String(payload.isFeatured || false));
 
   formData.append("active", String(payload.active));
   formData.append("sortOrder", String(payload.sortOrder || 0));
@@ -80,13 +102,21 @@ export const resolveTourPackageImageUrl = (imageUrl: string) => {
   return imageUrl;
 };
 
-export const listarTourPackages = async (includeInactive = false) => {
+export const listarTourPackages = async (
+  includeInactive = false,
+  fetchOptions: RequestInit & { next?: { revalidate?: number } } = {},
+) => {
+  const endpoint = includeInactive
+    ? `${API_URL}/api/tour-packages/admin/lista?includeInactive=true`
+    : `${API_URL}/api/tour-packages?includeInactive=false`;
+
   const response = await fetch(
-    `${API_URL}/api/tour-packages?includeInactive=${includeInactive}`,
+    endpoint,
     {
       method: "GET",
       credentials: "include",
       cache: "no-store",
+      ...fetchOptions,
     },
   );
 
