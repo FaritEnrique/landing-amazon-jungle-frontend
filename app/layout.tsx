@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import {
   Geist_Mono,
   Great_Vibes,
@@ -94,14 +95,26 @@ export const viewport: Viewport = {
   themeColor: "#065f46",
 };
 
-const RootLayout = ({
+const resolveHtmlLang = (pathname: string | null) => {
+  if (pathname?.startsWith("/es")) {
+    return "es-PE";
+  }
+
+  return "en";
+};
+
+const RootLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const requestHeaders = await headers();
+  const htmlLang = resolveHtmlLang(requestHeaders.get("x-pathname"));
+
   return (
     <html
-      lang="en"
+      lang={htmlLang}
+      suppressHydrationWarning
       className={`${montserrat.variable} ${playfair.variable} ${greatVibes.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden font-sans">

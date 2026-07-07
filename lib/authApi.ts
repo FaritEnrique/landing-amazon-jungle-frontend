@@ -9,6 +9,7 @@ export interface AuthUser {
   email: string;
   role: AuthRole;
   area: string;
+  isActive: boolean;
 }
 
 interface BootstrapAdminPayload {
@@ -39,6 +40,26 @@ interface ChangePasswordPayload {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
+}
+
+interface CreateUserPayload {
+  fullName: string;
+  dni: string;
+  area: string;
+  email: string;
+  role: AuthRole;
+  password: string;
+  confirmPassword: string;
+}
+
+interface UpdateUserPayload {
+  fullName?: string;
+  dni?: string;
+  area?: string;
+  email?: string;
+  role?: AuthRole;
+  password?: string;
+  confirmPassword?: string;
 }
 
 const parseApiResponse = async <T>(response: Response): Promise<T> => {
@@ -168,5 +189,70 @@ export const changePassword = async (payload: ChangePasswordPayload) => {
   return parseApiResponse<{
     ok: boolean;
     message: string;
+  }>(response);
+};
+
+
+export const listUsers = async () => {
+  const response = await fetch(`${API_URL}/api/auth/users`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store"
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    users: AuthUser[];
+  }>(response);
+};
+
+export const createUser = async (payload: CreateUserPayload) => {
+  const response = await fetch(`${API_URL}/api/auth/users`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    user: AuthUser;
+  }>(response);
+};
+
+export const updateUser = async (userId: string, payload: UpdateUserPayload) => {
+  const response = await fetch(`${API_URL}/api/auth/users/${userId}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    user: AuthUser;
+  }>(response);
+};
+
+export const updateUserStatus = async (userId: string, isActive: boolean) => {
+  const response = await fetch(`${API_URL}/api/auth/users/${userId}/status`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ isActive })
+  });
+
+  return parseApiResponse<{
+    ok: boolean;
+    message: string;
+    user: AuthUser;
   }>(response);
 };

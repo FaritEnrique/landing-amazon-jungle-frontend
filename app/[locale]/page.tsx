@@ -14,11 +14,10 @@ const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
   "https://landing.amazonjungle-expeditions.com"
 ).replace(/\/$/, "");
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(
-  /\/$/,
-  "",
-);
-const DEFAULT_SOCIAL_IMAGE = "/images/logos/Logo-sbg.webp";
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+).replace(/\/$/, "");
+const DEFAULT_SOCIAL_IMAGE = "/images/og/amazon-jungle-expeditions-og.webp";
 
 const getLocalizedSiteUrl = (locale: Locale) => `${SITE_URL}/${locale}`;
 
@@ -203,12 +202,14 @@ export const generateMetadata = async ({
   const metadata = landingSeo?.metadata;
   const localizedUrl = getLocalizedSiteUrl(locale);
   const ogImage =
-    resolveAbsoluteUrl(metadata?.ogImageUrl) || resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
+    resolveAbsoluteUrl(metadata?.ogImageUrl) ||
+    resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
   const twitterImage =
     resolveAbsoluteUrl(metadata?.twitterImageUrl || metadata?.ogImageUrl) ||
     resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
   const metadataTitle = metadata?.title || "Amazon Jungle Expeditions";
-  const metadataDescription = metadata?.description || copy[locale].contactDescription;
+  const metadataDescription =
+    metadata?.description || copy[locale].contactDescription;
 
   return {
     title: metadataTitle,
@@ -225,7 +226,8 @@ export const generateMetadata = async ({
       title: metadata?.ogTitle || metadataTitle,
       description: metadata?.ogDescription || metadataDescription,
       url: localizedUrl,
-      siteName: landingSeo?.business?.businessName || "Amazon Jungle Expeditions",
+      siteName:
+        landingSeo?.business?.businessName || "Amazon Jungle Expeditions",
       locale: locale === "es" ? "es_PE" : "en_US",
       alternateLocale: locale === "es" ? ["en_US"] : ["es_PE"],
       type: "website",
