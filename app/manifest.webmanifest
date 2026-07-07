@@ -1,12 +1,12 @@
 {
   "name": "Amazon Jungle Expeditions",
   "short_name": "AmazonJungle",
-  "description": "Página de aterrizaje para Amazon Jungle Expeditions, una empresa de turismo de aventura en la selva amazónica.",
-  "start_url": "/",
+  "description": "Landing page for Amazon Jungle Expeditions, an adventure tourism company in the Peruvian Amazon rainforest.",
+  "start_url": "/en",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
-  "theme_color": "#1e3a8a",
+  "theme_color": "#065f46",
   "icons": [
     {
       "src": "/icons/android-chrome-192x192.png",
