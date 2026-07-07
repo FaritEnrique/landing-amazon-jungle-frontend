@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, Phone, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { FaInstagram, FaYoutube } from "react-icons/fa";
+import { FaHome, FaInstagram, FaYoutube } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { LuNetwork } from "react-icons/lu";
 import { copy, getLocale } from "@/lib/i18n";
@@ -12,6 +12,10 @@ import { copy, getLocale } from "@/lib/i18n";
 const MAIN_SITE_URL =
   process.env.NEXT_PUBLIC_MAIN_SITE_URL ||
   "https://www.amazonjungle-expeditions.com";
+
+const LANDING_SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://landing.amazonjungle-expeditions.com";
 
 const Header = () => {
   const pathname = usePathname();
@@ -23,6 +27,8 @@ const Header = () => {
 
   const isHomePage = pathname === "/" || pathname === `/${locale}`;
   const isOverlayHeader = isHomePage && !hasScrolled && !isMenuOpen;
+  const landingLabel =
+    locale === "es" ? "Ir a la página landing" : "Go to landing home";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,7 +43,6 @@ const Header = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
 
   return (
     <>
@@ -59,7 +64,8 @@ const Header = () => {
               className="flex items-center gap-2 tracking-wide text-emerald-50 transition hover:text-white"
             >
               <Phone size={15} />
-              {locale === "es" ? "RESERVAR" : "BOOK"} (+51) 943214093 / 937069135 / 963736321
+              {locale === "es" ? "RESERVAR" : "BOOK"} (+51) 943214093 /
+              937069135 / 963736321
             </Link>
 
             <div className="flex items-center gap-4">
@@ -103,10 +109,7 @@ const Header = () => {
               isOverlayHeader ? "py-4 lg:py-5" : "py-3 lg:py-4",
             ].join(" ")}
           >
-            <Link
-              href={MAIN_SITE_URL}
-              className="flex items-center gap-3"
-            >
+            <Link href={MAIN_SITE_URL} className="flex items-center gap-3">
               <div
                 className={[
                   "relative overflow-hidden rounded-full transition-all duration-300",
@@ -153,15 +156,31 @@ const Header = () => {
             {/* Acción desktop */}
             <div className="hidden items-center gap-3 lg:flex">
               <Link
-                href="/login"
+                href={LANDING_SITE_URL}
+                aria-label={landingLabel}
+                title={landingLabel}
                 className={[
-                  "rounded-full px-5 py-2.5 text-sm font-black uppercase tracking-wide shadow-lg transition",
+                  "inline-flex h-11 w-11 items-center justify-center rounded-full text-sm font-black shadow-lg transition",
+                  isOverlayHeader
+                    ? "bg-white text-emerald-900 shadow-black/20 hover:bg-emerald-50"
+                    : "bg-emerald-100 text-emerald-900 shadow-emerald-900/10 hover:bg-emerald-200",
+                ].join(" ")}
+              >
+                <FaHome size={20} aria-hidden="true" />
+              </Link>
+
+              <Link
+                href="/login"
+                aria-label={t.intranet}
+                title={t.intranet}
+                className={[
+                  "inline-flex h-11 w-11 items-center justify-center rounded-full text-sm font-black shadow-lg transition",
                   isOverlayHeader
                     ? "bg-white text-emerald-900 shadow-black/20 hover:bg-emerald-50"
                     : "bg-emerald-700 text-white shadow-emerald-900/15 hover:bg-emerald-800",
                 ].join(" ")}
               >
-                <LuNetwork size={24} title={t.intranet} />
+                <LuNetwork size={22} aria-hidden="true" />
               </Link>
             </div>
 
@@ -185,6 +204,15 @@ const Header = () => {
           {isMenuOpen && (
             <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-xl lg:hidden">
               <nav className="flex flex-col gap-1 text-sm font-bold text-slate-700">
+                <Link
+                  href={LANDING_SITE_URL}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-2 rounded-xl px-4 py-3 text-emerald-700 transition hover:bg-emerald-50"
+                >
+                  <FaHome size={17} aria-hidden="true" />
+                  {locale === "es" ? "Landing" : "Home"}
+                </Link>
+
                 <Link
                   href="https://wa.me/51943214093"
                   target="_blank"
@@ -219,10 +247,13 @@ const Header = () => {
 
                 <Link
                   href="/login"
+                  aria-label={t.intranet}
+                  title={t.intranet}
                   onClick={() => setIsMenuOpen(false)}
-                  className="mt-3 rounded-full bg-emerald-700 px-5 py-3 text-center font-black uppercase tracking-wide text-white transition hover:bg-emerald-800"
+                  className="mt-3 flex items-center justify-center gap-2 rounded-full bg-emerald-700 px-5 py-3 text-center font-black uppercase tracking-wide text-white transition hover:bg-emerald-800"
                 >
-                  <LuNetwork size={18} />
+                  <LuNetwork size={18} aria-hidden="true" />
+                  <span>{t.intranet}</span>
                 </Link>
               </nav>
             </div>
