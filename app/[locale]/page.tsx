@@ -55,12 +55,16 @@ const getLandingSeo = async (locale: Locale) => {
 
 const getToursForStructuredData = async (locale: Locale) => {
   try {
-    return await listarTourPackages(false, {
-      cache: "force-cache",
-      next: {
-        revalidate: 300,
+    return await listarTourPackages(
+      false,
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+        },
       },
-    }, locale);
+      locale,
+    );
   } catch {
     return [];
   }
@@ -206,8 +210,12 @@ export const generateMetadata = async ({
       },
     },
     openGraph: {
-      title: metadata?.ogTitle || metadata?.title || "Amazon Jungle Expeditions",
-      description: metadata?.ogDescription || metadata?.description || copy[locale].contactDescription,
+      title:
+        metadata?.ogTitle || metadata?.title || "Amazon Jungle Expeditions",
+      description:
+        metadata?.ogDescription ||
+        metadata?.description ||
+        copy[locale].contactDescription,
       url: localizedUrl,
       locale: locale === "es" ? "es_PE" : "en_US",
       alternateLocale: locale === "es" ? ["en_US"] : ["es_PE"],
@@ -215,8 +223,14 @@ export const generateMetadata = async ({
     },
     twitter: {
       card: "summary_large_image",
-      title: metadata?.twitterTitle || metadata?.title || "Amazon Jungle Expeditions",
-      description: metadata?.twitterDescription || metadata?.description || copy[locale].contactDescription,
+      title:
+        metadata?.twitterTitle ||
+        metadata?.title ||
+        "Amazon Jungle Expeditions",
+      description:
+        metadata?.twitterDescription ||
+        metadata?.description ||
+        copy[locale].contactDescription,
     },
     robots: {
       index: metadata?.robotsIndex ?? true,
@@ -225,11 +239,7 @@ export const generateMetadata = async ({
   };
 };
 
-const Home = async ({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) => {
+const Home = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale: rawLocale } = await params;
   const locale = getLocale(rawLocale);
   const t = copy[locale];
@@ -255,7 +265,7 @@ const Home = async ({
 
       <HeroCarousel initialSlides={slides} locale={locale} />
 
-      <TourPackagesGrid locale={locale} />
+      <TourPackagesGrid locale={locale} initialPackages={tours} />
 
       {faqs.length > 0 ? (
         <section

@@ -12,7 +12,13 @@ const isExternalUrl = (url: string) => {
   return url.startsWith("http://") || url.startsWith("https://");
 };
 
-const TourPackageButton = ({ href, label }: { href: string; label: string }) => {
+const TourPackageButton = ({
+  href,
+  label,
+}: {
+  href: string;
+  label: string;
+}) => {
   const className =
     "mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-[#465c12] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-[#33440d]";
 
@@ -35,23 +41,35 @@ const TourPackageButton = ({ href, label }: { href: string; label: string }) => 
 
 const getPublicTourPackages = async (locale: Locale) => {
   try {
-    return await listarTourPackages(false, {
-      cache: "force-cache",
-      next: {
-        revalidate: 300,
+    return await listarTourPackages(
+      false,
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+        },
       },
-    }, locale);
+      locale,
+    );
   } catch {
     return [];
   }
 };
 
-const TourPackagesGrid = async ({ locale = "en" }: { locale?: Locale }) => {
+type TourPackagesGridProps = {
+  locale?: Locale;
+  initialPackages?: TourPackage[];
+};
+
+const TourPackagesGrid = async ({
+  locale = "en",
+  initialPackages,
+}: TourPackagesGridProps) => {
   const t = copy[locale];
-  const packages = await getPublicTourPackages(locale);
+  const packages = initialPackages ?? (await getPublicTourPackages(locale));
 
   const activePackages = packages
-    .filter((pkg) => pkg.active && pkg.imageWebpUrl)
+    .filter((pkg) => pkg.active && Boolean(pkg.imageWebpUrl?.trim()))
     .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
 
   if (activePackages.length === 0) {
@@ -77,7 +95,9 @@ const TourPackagesGrid = async ({ locale = "en" }: { locale?: Locale }) => {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {activePackages.map((pkg: TourPackage) => {
-            const hasButton = Boolean(pkg.buttonLabel?.trim() && pkg.buttonHref?.trim());
+            const hasButton = Boolean(
+              pkg.buttonLabel?.trim() && pkg.buttonHref?.trim(),
+            );
             const imageAlt = pkg.seoAltText || pkg.imageAlt || pkg.overlayTitle;
             const description = pkg.excerpt || pkg.bottomDescription;
 
@@ -145,11 +165,17 @@ const TourPackagesGrid = async ({ locale = "en" }: { locale?: Locale }) => {
                     <meta itemProp="price" content={String(pkg.priceAmount)} />
                   ) : null}
                   {pkg.priceCurrency ? (
-                    <meta itemProp="priceCurrency" content={pkg.priceCurrency} />
+                    <meta
+                      itemProp="priceCurrency"
+                      content={pkg.priceCurrency}
+                    />
                   ) : null}
 
                   {hasButton && pkg.buttonLabel && pkg.buttonHref ? (
-                    <TourPackageButton href={pkg.buttonHref} label={pkg.buttonLabel} />
+                    <TourPackageButton
+                      href={pkg.buttonHref}
+                      label={pkg.buttonLabel}
+                    />
                   ) : null}
                 </div>
               </article>
