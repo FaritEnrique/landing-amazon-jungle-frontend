@@ -10,10 +10,15 @@ import {
   resolveTourPackageImageUrl,
 } from "@/lib/tourPackagesApi";
 
-const SITE_URL =
+const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://landing.amazonjungle-expeditions.com";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  "https://landing.amazonjungle-expeditions.com"
+).replace(/\/$/, "");
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(
+  /\/$/,
+  "",
+);
+const DEFAULT_SOCIAL_IMAGE = "/images/logos/Logo-sbg.webp";
 
 const getLocalizedSiteUrl = (locale: Locale) => `${SITE_URL}/${locale}`;
 
@@ -197,10 +202,17 @@ export const generateMetadata = async ({
   const landingSeo = await getLandingSeo(locale);
   const metadata = landingSeo?.metadata;
   const localizedUrl = getLocalizedSiteUrl(locale);
+  const ogImage =
+    resolveAbsoluteUrl(metadata?.ogImageUrl) || resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
+  const twitterImage =
+    resolveAbsoluteUrl(metadata?.twitterImageUrl || metadata?.ogImageUrl) ||
+    resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
+  const metadataTitle = metadata?.title || "Amazon Jungle Expeditions";
+  const metadataDescription = metadata?.description || copy[locale].contactDescription;
 
   return {
-    title: metadata?.title || "Amazon Jungle Expeditions",
-    description: metadata?.description || copy[locale].contactDescription,
+    title: metadataTitle,
+    description: metadataDescription,
     alternates: {
       canonical: localizedUrl,
       languages: {
@@ -210,31 +222,43 @@ export const generateMetadata = async ({
       },
     },
     openGraph: {
-      title:
-        metadata?.ogTitle || metadata?.title || "Amazon Jungle Expeditions",
-      description:
-        metadata?.ogDescription ||
-        metadata?.description ||
-        copy[locale].contactDescription,
+      title: metadata?.ogTitle || metadataTitle,
+      description: metadata?.ogDescription || metadataDescription,
       url: localizedUrl,
+      siteName: landingSeo?.business?.businessName || "Amazon Jungle Expeditions",
       locale: locale === "es" ? "es_PE" : "en_US",
       alternateLocale: locale === "es" ? ["en_US"] : ["es_PE"],
       type: "website",
+      images: ogImage
+        ? [
+            {
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              alt: metadata?.ogTitle || metadataTitle,
+            },
+          ]
+        : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title:
-        metadata?.twitterTitle ||
-        metadata?.title ||
-        "Amazon Jungle Expeditions",
+      title: metadata?.twitterTitle || metadata?.ogTitle || metadataTitle,
       description:
         metadata?.twitterDescription ||
-        metadata?.description ||
-        copy[locale].contactDescription,
+        metadata?.ogDescription ||
+        metadataDescription,
+      images: twitterImage ? [twitterImage] : undefined,
     },
     robots: {
       index: metadata?.robotsIndex ?? true,
       follow: metadata?.robotsFollow ?? true,
+      googleBot: {
+        index: metadata?.robotsIndex ?? true,
+        follow: metadata?.robotsFollow ?? true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
   };
 };
