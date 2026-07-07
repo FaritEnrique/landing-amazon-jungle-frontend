@@ -1,9 +1,11 @@
+import type { Locale } from "@/lib/i18n";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export type SeoImageTarget = "og" | "twitter";
 
 export interface SeoKeyword {
   id: string;
+  locale?: Locale;
   phrase: string;
   source: string | null;
   notes: string | null;
@@ -22,8 +24,22 @@ export interface SeoKeyword {
   } | null;
 }
 
+export interface SeoHomeTranslation {
+  title: string;
+  description: string;
+  canonicalUrl?: string | null;
+  ogTitle?: string | null;
+  ogDescription?: string | null;
+  twitterTitle?: string | null;
+  twitterDescription?: string | null;
+  focusKeyword?: string | null;
+  secondaryKeywords?: string | null;
+  shareMessage?: string | null;
+}
+
 export interface SeoHome {
   id: string;
+  locale?: Locale;
   title: string;
   description: string;
   canonicalUrl: string | null;
@@ -39,6 +55,7 @@ export interface SeoHome {
   secondaryKeywords: string | null;
   shareMessage: string | null;
   createdAt: string;
+  translations?: Partial<Record<Locale, SeoHomeTranslation>>;
   updatedAt: string;
 }
 
@@ -66,13 +83,20 @@ export interface SeoBusinessProfile {
   updatedAt: string;
 }
 
+export interface SeoFaqTranslation {
+  question: string;
+  answer: string;
+}
+
 export interface SeoFaq {
   id: string;
+  locale?: Locale;
   question: string;
   answer: string;
   position: number;
   isActive: boolean;
   createdAt: string;
+  translations?: Partial<Record<Locale, SeoFaqTranslation>>;
   updatedAt: string;
   createdBy?: {
     id: string;
@@ -100,6 +124,7 @@ export interface LandingSeoData {
 }
 
 export interface SeoKeywordPayload {
+  locale?: Locale;
   phrase: string;
   source?: string | null;
   notes?: string | null;
@@ -111,7 +136,7 @@ export type SeoBusinessProfilePayload = Omit<
   SeoBusinessProfile,
   "id" | "createdAt" | "updatedAt"
 >;
-export type SeoFaqPayload = Pick<SeoFaq, "question" | "answer" | "position" | "isActive">;
+export type SeoFaqPayload = Pick<SeoFaq, "question" | "answer" | "position" | "isActive" | "translations">;
 
 const parseApiResponse = async <T>(response: Response): Promise<T> => {
   const data = await response.json().catch(() => null);
@@ -123,8 +148,8 @@ const parseApiResponse = async <T>(response: Response): Promise<T> => {
   return data as T;
 };
 
-export const getPublicSeoMetadata = async () => {
-  const response = await fetch(`${API_URL}/api/seo/meta`, {
+export const getPublicSeoMetadata = async (locale: Locale = "en") => {
+  const response = await fetch(`${API_URL}/api/seo/meta?locale=${locale}`, {
     method: "GET",
     next: {
       revalidate: 300,
@@ -137,8 +162,8 @@ export const getPublicSeoMetadata = async () => {
   }>(response);
 };
 
-export const getPublicLandingSeo = async () => {
-  const response = await fetch(`${API_URL}/api/seo/landing`, {
+export const getPublicLandingSeo = async (locale: Locale = "en") => {
+  const response = await fetch(`${API_URL}/api/seo/landing?locale=${locale}`, {
     method: "GET",
     next: {
       revalidate: 300,
@@ -151,8 +176,8 @@ export const getPublicLandingSeo = async () => {
   }>(response);
 };
 
-export const getSeoHome = async () => {
-  const response = await fetch(`${API_URL}/api/seo/home`, {
+export const getSeoHome = async (locale: Locale = "en") => {
+  const response = await fetch(`${API_URL}/api/seo/home?locale=${locale}`, {
     method: "GET",
     credentials: "include",
     cache: "no-store",

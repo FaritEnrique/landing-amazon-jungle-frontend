@@ -5,6 +5,7 @@ import {
   listarTourPackages,
   resolveTourPackageImageUrl,
 } from "@/lib/tourPackagesApi";
+import { copy, type Locale } from "@/lib/i18n";
 import type { TourPackage } from "./tourPackageTypes";
 
 const isExternalUrl = (url: string) => {
@@ -32,21 +33,22 @@ const TourPackageButton = ({ href, label }: { href: string; label: string }) => 
   );
 };
 
-const getPublicTourPackages = async () => {
+const getPublicTourPackages = async (locale: Locale) => {
   try {
     return await listarTourPackages(false, {
       cache: "force-cache",
       next: {
         revalidate: 300,
       },
-    });
+    }, locale);
   } catch {
     return [];
   }
 };
 
-const TourPackagesGrid = async () => {
-  const packages = await getPublicTourPackages();
+const TourPackagesGrid = async ({ locale = "en" }: { locale?: Locale }) => {
+  const t = copy[locale];
+  const packages = await getPublicTourPackages(locale);
 
   const activePackages = packages
     .filter((pkg) => pkg.active && pkg.imageWebpUrl)
@@ -61,17 +63,15 @@ const TourPackagesGrid = async () => {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 text-center">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-800 dark:text-emerald-400">
-            Amazon Jungle Expeditions
+            {t.toursEyebrow}
           </p>
 
           <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-emerald-950 dark:text-white sm:text-4xl">
-            Choose your Amazon experience
+            {t.toursTitle}
           </h2>
 
           <p className="mx-auto mt-3 max-w-3xl text-sm leading-7 text-slate-700 dark:text-slate-300 sm:text-base">
-            Guided tours and lodge-based rainforest experiences from Iquitos,
-            designed for travelers looking for nature, culture and authentic
-            Amazonian hospitality.
+            {t.toursDescription}
           </p>
         </div>
 

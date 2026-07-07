@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { FaInstagram, FaYoutube } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { LuNetwork } from "react-icons/lu";
+import { copy, getLocale } from "@/lib/i18n";
 
 const MAIN_SITE_URL =
   process.env.NEXT_PUBLIC_MAIN_SITE_URL ||
@@ -14,11 +15,13 @@ const MAIN_SITE_URL =
 
 const Header = () => {
   const pathname = usePathname();
+  const locale = getLocale(pathname?.split("/").filter(Boolean)[0]);
+  const t = copy[locale];
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
 
-  const isHomePage = pathname === "/";
+  const isHomePage = pathname === "/" || pathname === `/${locale}`;
   const isOverlayHeader = isHomePage && !hasScrolled && !isMenuOpen;
 
   useEffect(() => {
@@ -56,7 +59,7 @@ const Header = () => {
               className="flex items-center gap-2 tracking-wide text-emerald-50 transition hover:text-white"
             >
               <Phone size={15} />
-              RESERVAR (+51) 943214093 / 937069135 / 963736321
+              {locale === "es" ? "RESERVAR" : "BOOK"} (+51) 943214093 / 937069135 / 963736321
             </Link>
 
             <div className="flex items-center gap-4">
@@ -158,14 +161,14 @@ const Header = () => {
                     : "bg-emerald-700 text-white shadow-emerald-900/15 hover:bg-emerald-800",
                 ].join(" ")}
               >
-                <LuNetwork size={24} title="Intranet Corporativa" />
+                <LuNetwork size={24} title={t.intranet} />
               </Link>
             </div>
 
             {/* Botón móvil */}
             <button
               type="button"
-              aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
               onClick={() => setIsMenuOpen((current) => !current)}
               className={[
                 "grid h-11 w-11 place-items-center rounded-full border transition lg:hidden",
@@ -189,7 +192,7 @@ const Header = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className="rounded-xl px-4 py-3 text-emerald-700 transition hover:bg-emerald-50"
                 >
-                  Reservar por WhatsApp
+                  {t.reserveWhatsapp}
                 </Link>
 
                 <Link

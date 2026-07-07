@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getMe, type AuthUser } from "@/lib/authApi";
 
@@ -100,15 +101,16 @@ const DashboardPage = () => {
             </h2>
 
             <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-              Administra metadata, Open Graph, perfil del negocio, FAQs y frases objetivo de la única landing pública.
+              Administra metadata, Open Graph, perfil del negocio, FAQs y frases
+              objetivo de la única landing pública.
             </p>
 
-            <a
+            <Link
               href="/dashboard/seo"
               className="mt-4 inline-flex rounded-xl bg-emerald-800 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900"
             >
               Gestionar SEO
-            </a>
+            </Link>
           </div>
 
           <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
@@ -117,15 +119,16 @@ const DashboardPage = () => {
             </h2>
 
             <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-              Administra las imágenes de fondo, textos, botones y orden del hero superior de la landing.
+              Administra las imágenes de fondo, textos, botones y orden del hero
+              superior de la landing.
             </p>
 
-            <a
+            <Link
               href="/dashboard/hero-carousel"
               className="mt-4 inline-flex rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-950 transition hover:bg-amber-400"
             >
               Gestionar carrusel
-            </a>
+            </Link>
           </div>
 
           <div className="rounded-2xl border border-lime-100 bg-lime-50 p-4 dark:border-lime-900/40 dark:bg-lime-950/20">
@@ -134,15 +137,16 @@ const DashboardPage = () => {
             </h2>
 
             <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-              Administra las imágenes WebP, textos sobre fotografía, precios y contenido inferior de los tours.
+              Administra las imágenes WebP, textos sobre fotografía, precios y
+              contenido inferior de los tours.
             </p>
 
-            <a
+            <Link
               href="/dashboard/tour-packages"
               className="mt-4 inline-flex rounded-xl bg-lime-600 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-lime-700"
             >
               Gestionar paquetes
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -3,13 +3,11 @@
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import {
-  listPublicHeroSlides,
-  resolveHeroImageUrl,
-  type HeroSlide,
-} from "@/lib/heroSlidesApi";
+import { copy, type Locale } from "@/lib/i18n";
+import { resolveHeroImageUrl, type HeroSlide } from "@/lib/heroSlidesApi";
 
-const fallbackSlides: HeroSlide[] = [
+const fallbackSlidesByLocale: Record<Locale, HeroSlide[]> = {
+  en: [
   {
     id: "fallback-amazon-hero",
     imageUrl: "/images/hero/amazon-hero-fallback.svg",
@@ -29,7 +27,29 @@ const fallbackSlides: HeroSlide[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
-];
+  ],
+  es: [
+    {
+      id: "fallback-amazon-hero-es",
+      imageUrl: "/images/hero/amazon-hero-fallback.svg",
+      altText: "Paisaje de la selva amazónica peruana",
+      eyebrow: "Salidas diarias desde Iquitos, Perú",
+      titleBefore: "Explora la",
+      titleHighlight: "Amazonía viva,",
+      titleAfter: "guiado por quienes la llaman hogar",
+      description:
+        "Vive la selva desde un albergue familiar, con excursiones auténticas, naturaleza viva, cultura local y guías que conocen la jungla de corazón.",
+      primaryButtonText: "Reservar por WhatsApp",
+      primaryButtonUrl:
+        "https://wa.me/51943214093?text=Hola%20Amazon%20Jungle%20Expeditions%2C%20quiero%20hacer%20una%20reserva.",
+      backgroundPosition: "center center",
+      sortOrder: 0,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ],
+};
 
 const AUTOPLAY_DELAY = 6500;
 
@@ -60,50 +80,25 @@ const HeroActionLink = ({
 
 interface HeroCarouselProps {
   initialSlides?: HeroSlide[];
+  locale?: Locale;
 }
 
 const HeroCarousel = ({
-  initialSlides = fallbackSlides,
+  initialSlides,
+  locale = "en",
 }: HeroCarouselProps) => {
-  const [slides, setSlides] = useState<HeroSlide[]>(
-    initialSlides.length > 0 ? initialSlides : fallbackSlides,
+  const t = copy[locale];
+  const fallbackSlides = fallbackSlidesByLocale[locale];
+  const [slides] = useState<HeroSlide[]>(
+    initialSlides && initialSlides.length > 0 ? initialSlides : fallbackSlides,
   );
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(initialSlides.length === 0);
 
   const activeSlides = useMemo(() => {
     return slides.filter((slide) => slide.isActive && slide.imageUrl);
   }, [slides]);
 
   const currentSlide = activeSlides[currentIndex] || activeSlides[0];
-
-  useEffect(() => {
-    let isMounted = true;
-
-    listPublicHeroSlides()
-      .then((response) => {
-        if (!isMounted) return;
-
-        if (response.slides.length > 0) {
-          setSlides(response.slides);
-          setCurrentIndex(0);
-        }
-      })
-      .catch(() => {
-        if (!isMounted) return;
-
-        setSlides(fallbackSlides);
-      })
-      .finally(() => {
-        if (!isMounted) return;
-
-        setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (activeSlides.length <= 1) {
@@ -159,7 +154,7 @@ const HeroCarousel = ({
       className="relative isolate min-h-svh overflow-hidden bg-emerald-950 text-white"
       role="region"
       aria-roledescription="carousel"
-      aria-label="Main carousel"
+      aria-label={t.carouselLabel}
     >
       <Image
         key={currentSlide.id}
@@ -220,7 +215,7 @@ const HeroCarousel = ({
             type="button"
             onClick={goToPrevious}
             className="absolute bottom-8 right-24 hidden h-11 w-11 place-items-center rounded-full border border-white/25 bg-white/10 text-white shadow-lg backdrop-blur-md transition hover:bg-white/20 md:grid"
-            aria-label="Previous carousel image"
+            aria-label={t.previousSlide}
           >
             <ChevronLeft size={20} aria-hidden="true" />
           </button>
@@ -229,7 +224,7 @@ const HeroCarousel = ({
             type="button"
             onClick={goToNext}
             className="absolute bottom-8 right-10 hidden h-11 w-11 place-items-center rounded-full border border-white/25 bg-white/10 text-white shadow-lg backdrop-blur-md transition hover:bg-white/20 md:grid"
-            aria-label="Siguiente imagen del carrusel"
+            aria-label={t.nextSlide}
           >
             <ChevronRight size={20} aria-hidden="true" />
           </button>
@@ -248,7 +243,7 @@ const HeroCarousel = ({
                     ? "w-8 bg-amber-400"
                     : "w-2.5 bg-white/50 hover:bg-white/80"
                 }`}
-                aria-label={`Go to slide ${index + 1}`}
+                aria-label={`${t.goToSlide} ${index + 1}`}
                 aria-current={index === currentIndex ? "true" : undefined}
               />
             ))}
@@ -256,11 +251,6 @@ const HeroCarousel = ({
         </>
       )}
 
-      {isLoading && (
-        <div className="pointer-events-none absolute bottom-8 left-4 rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white/70 backdrop-blur-md sm:left-6">
-          Loading carousel...
-        </div>
-      )}
     </section>
   );
 };

@@ -5,6 +5,7 @@ type SharePlatform = "whatsapp" | "facebook" | "twitter";
 interface ShareButtonsProps {
   title?: string;
   message?: string;
+  description?: string;
   url?: string;
 }
 
@@ -18,6 +19,7 @@ const openShareWindow = (shareUrl: string) => {
 const ShareButtons = ({
   title = "Share this experience",
   message = defaultShareMessage,
+  description = "Invite friends and travelers to discover the Amazon from Iquitos.",
   url,
 }: ShareButtonsProps) => {
   const getShareUrl = () => {
@@ -71,7 +73,7 @@ const ShareButtons = ({
           </h2>
 
           <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Invite friends and travelers to discover the Amazon from Iquitos.
+            {description}
           </p>
         </div>
 

@@ -1,4 +1,5 @@
-import type { TourPackage } from "@/app/components/tours/tourPackageTypes";
+import type { Locale } from "@/lib/i18n";
+import type { TourPackage, TourPackageTranslation } from "@/app/components/tours/tourPackageTypes";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -10,7 +11,7 @@ interface ApiResponse<T> {
   errors?: string[];
 }
 
-export interface TourPackagePayload {
+export interface TourPackagePayload extends TourPackageTranslation {
   duration: string;
   overlayTitle: string;
   price: string;
@@ -36,6 +37,7 @@ export interface TourPackagePayload {
 
   active: boolean;
   sortOrder: number;
+  translations?: Partial<Record<Locale, TourPackageTranslation>>;
 }
 
 const buildFormData = (payload: TourPackagePayload) => {
@@ -61,6 +63,10 @@ const buildFormData = (payload: TourPackagePayload) => {
   formData.append("priceAmount", payload.priceAmount ? String(payload.priceAmount) : "");
   formData.append("seoAltText", payload.seoAltText || "");
   formData.append("isFeatured", String(payload.isFeatured || false));
+
+  if (payload.translations) {
+    formData.append("translations", JSON.stringify(payload.translations));
+  }
 
   formData.append("active", String(payload.active));
   formData.append("sortOrder", String(payload.sortOrder || 0));
@@ -105,10 +111,11 @@ export const resolveTourPackageImageUrl = (imageUrl: string) => {
 export const listarTourPackages = async (
   includeInactive = false,
   fetchOptions: RequestInit & { next?: { revalidate?: number } } = {},
+  locale: Locale = "en",
 ) => {
   const endpoint = includeInactive
-    ? `${API_URL}/api/tour-packages/admin/lista?includeInactive=true`
-    : `${API_URL}/api/tour-packages?includeInactive=false`;
+    ? `${API_URL}/api/tour-packages/admin/lista?includeInactive=true&locale=${locale}`
+    : `${API_URL}/api/tour-packages?includeInactive=false&locale=${locale}`;
 
   const response = await fetch(
     endpoint,

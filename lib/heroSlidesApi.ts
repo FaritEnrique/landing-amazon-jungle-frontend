@@ -1,7 +1,19 @@
+import type { Locale } from "@/lib/i18n";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+export interface HeroSlideTranslation {
+  altText: string;
+  eyebrow?: string | null;
+  titleBefore?: string | null;
+  titleHighlight?: string | null;
+  titleAfter?: string | null;
+  description?: string | null;
+  primaryButtonText?: string | null;
+}
 
 export interface HeroSlide {
   id: string;
+  locale?: Locale;
   imageUrl: string;
   altText: string;
   eyebrow: string | null;
@@ -15,6 +27,7 @@ export interface HeroSlide {
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
+  translations?: Partial<Record<Locale, HeroSlideTranslation>>;
   updatedAt: string;
   createdBy?: {
     id: string;
@@ -28,9 +41,8 @@ export interface HeroSlide {
   } | null;
 }
 
-export interface HeroSlidePayload {
+export interface HeroSlidePayload extends HeroSlideTranslation {
   imageDataUrl?: string;
-  altText: string;
   eyebrow?: string | null;
   titleBefore?: string | null;
   titleHighlight?: string | null;
@@ -41,6 +53,7 @@ export interface HeroSlidePayload {
   backgroundPosition?: string;
   sortOrder?: number;
   isActive?: boolean;
+  translations?: Partial<Record<Locale, HeroSlideTranslation>>;
 }
 
 const parseApiResponse = async <T>(response: Response): Promise<T> => {
@@ -69,10 +82,17 @@ export const resolveHeroImageUrl = (imageUrl: string) => {
   return imageUrl;
 };
 
-export const listPublicHeroSlides = async () => {
-  const response = await fetch(`${API_URL}/api/hero-slides/public`, {
+export const listPublicHeroSlides = async (
+  locale: Locale = "en",
+  fetchOptions: RequestInit & { next?: { revalidate?: number } } = {},
+) => {
+  const response = await fetch(`${API_URL}/api/hero-slides/public?locale=${locale}`, {
     method: "GET",
-    cache: "no-store",
+    cache: "force-cache",
+    next: {
+      revalidate: 300,
+    },
+    ...fetchOptions,
   });
 
   return parseApiResponse<{
