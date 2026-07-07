@@ -46,6 +46,34 @@ const SITE_URL = normalizeBaseUrl(
     "https://landing.amazonjungle-expeditions.com",
 );
 
+const ALTERNATE_ES_URL = process.env.NEXT_PUBLIC_ALTERNATE_ES_URL
+  ? normalizeBaseUrl(process.env.NEXT_PUBLIC_ALTERNATE_ES_URL)
+  : null;
+const ALTERNATE_EN_URL = process.env.NEXT_PUBLIC_ALTERNATE_EN_URL
+  ? normalizeBaseUrl(process.env.NEXT_PUBLIC_ALTERNATE_EN_URL)
+  : null;
+const ALTERNATE_DEFAULT_URL = process.env.NEXT_PUBLIC_ALTERNATE_DEFAULT_URL
+  ? normalizeBaseUrl(process.env.NEXT_PUBLIC_ALTERNATE_DEFAULT_URL)
+  : null;
+
+const getAlternateLanguages = () => {
+  const languages: Record<string, string> = {};
+
+  if (ALTERNATE_ES_URL) {
+    languages["es-PE"] = ALTERNATE_ES_URL;
+  }
+
+  if (ALTERNATE_EN_URL) {
+    languages.en = ALTERNATE_EN_URL;
+  }
+
+  if (ALTERNATE_DEFAULT_URL) {
+    languages["x-default"] = ALTERNATE_DEFAULT_URL;
+  }
+
+  return Object.keys(languages).length > 0 ? languages : undefined;
+};
+
 const fallbackSeoMetadata = {
   title: "Amazon Jungle Expeditions | Tours en Iquitos y Amazon Tours",
   description:
@@ -190,6 +218,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     keywords: seo.keywords,
     alternates: {
       canonical: canonicalUrl,
+      languages: getAlternateLanguages(),
     },
     openGraph: {
       title: seo.ogTitle || seo.title,
@@ -219,6 +248,13 @@ export const generateMetadata = async (): Promise<Metadata> => {
     robots: {
       index: seo.robotsIndex,
       follow: seo.robotsFollow,
+      googleBot: {
+        index: seo.robotsIndex,
+        follow: seo.robotsFollow,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
   };
 };

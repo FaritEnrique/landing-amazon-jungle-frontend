@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
@@ -155,16 +156,23 @@ const HeroCarousel = ({
 
   return (
     <section
-      className="relative isolate min-h-svh overflow-hidden bg-emerald-950 bg-cover bg-center text-white transition-[background-image] duration-700"
-      style={{
-        backgroundImage: `url("${backgroundImageUrl}")`,
-        backgroundPosition: currentSlide.backgroundPosition || "center center",
-      }}
+      className="relative isolate min-h-svh overflow-hidden bg-emerald-950 text-white"
       role="region"
       aria-roledescription="carousel"
       aria-label="Main carousel"
     >
-      <span className="sr-only">{currentSlide.altText}</span>
+      <Image
+        key={currentSlide.id}
+        src={backgroundImageUrl}
+        alt={currentSlide.altText || "Amazon Jungle Expeditions hero image"}
+        fill
+        priority={currentIndex === 0}
+        sizes="100vw"
+        className="object-cover transition-opacity duration-700"
+        style={{
+          objectPosition: currentSlide.backgroundPosition || "center center",
+        }}
+      />
 
       {hasOverlayContent && (
         <div className="mx-auto flex min-h-svh max-w-7xl items-center px-4 pb-16 pt-36 sm:px-6 lg:pb-20 lg:pt-44">

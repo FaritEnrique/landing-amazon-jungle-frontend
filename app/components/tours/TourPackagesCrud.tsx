@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -90,6 +91,10 @@ const validateImageFile = (file: File) => {
   }
 
   return null;
+};
+
+const shouldRenderImageUnoptimized = (url: string) => {
+  return url.startsWith("blob:") || url.startsWith("data:");
 };
 
 const buildFormFromPackage = (pkg: TourPackage): TourPackageFormState => {
@@ -491,12 +496,15 @@ const TourPackagesCrud = () => {
                   Imagen del paquete
                 </div>
 
-                <div className="mt-4 aspect-square overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-950">
+                <div className="relative mt-4 aspect-square overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-950">
                   {currentImageUrl ? (
-                    <img
+                    <Image
                       src={currentImageUrl}
                       alt={formData.imageAlt || "Vista previa"}
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 420px"
+                      className="object-cover"
+                      unoptimized={shouldRenderImageUnoptimized(currentImageUrl)}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center px-6 text-center text-xs font-semibold text-slate-400">
@@ -828,10 +836,12 @@ const TourPackagesCrud = () => {
                 >
                   <div className="relative aspect-square overflow-hidden bg-slate-200 dark:bg-slate-900">
                     {pkg.imageWebpUrl ? (
-                      <img
+                      <Image
                         src={resolveTourPackageImageUrl(pkg.imageWebpUrl)}
                         alt={pkg.imageAlt || pkg.overlayTitle}
-                        className="h-full w-full object-cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        className="object-cover"
                       />
                     ) : null}
 

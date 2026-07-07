@@ -8,6 +8,10 @@ import { FaInstagram, FaYoutube } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { LuNetwork } from "react-icons/lu";
 
+const MAIN_SITE_URL =
+  process.env.NEXT_PUBLIC_MAIN_SITE_URL ||
+  "https://www.amazonjungle-expeditions.com";
+
 const Header = () => {
   const pathname = usePathname();
 
@@ -31,9 +35,6 @@ const Header = () => {
     };
   }, []);
 
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
 
   return (
     <>
@@ -100,7 +101,7 @@ const Header = () => {
             ].join(" ")}
           >
             <Link
-              href="https://www.amazonjungle-expeditions.com/"
+              href={MAIN_SITE_URL}
               className="flex items-center gap-3"
             >
               <div

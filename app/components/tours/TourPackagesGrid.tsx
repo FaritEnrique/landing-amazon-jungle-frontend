@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 import {
@@ -88,12 +89,12 @@ const TourPackagesGrid = async () => {
                 itemType="https://schema.org/TouristTrip"
               >
                 <div className="group relative aspect-square w-full overflow-hidden bg-zinc-900">
-                  <img
+                  <Image
                     src={resolveTourPackageImageUrl(pkg.imageWebpUrl)}
                     alt={imageAlt}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
                     itemProp="image"
                   />
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
@@ -57,7 +58,7 @@ const emptyHomeForm: SeoHomePayload = {
   ogTitle: "Tours en Iquitos y Amazon tours from Iquitos",
   ogDescription:
     "Discover Amazon Jungle Expeditions: tours, lodge, rainforest excursions and authentic experiences in the Peruvian Amazon from Iquitos.",
-  ogImageUrl: "/images/seo/og-amazon-jungle-expeditions.jpg",
+  ogImageUrl: "",
   twitterTitle: "",
   twitterDescription: "",
   twitterImageUrl: "",
@@ -238,11 +239,14 @@ const SeoImageManager = ({
       </div>
 
       {previewUrl ? (
-        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <img
+        <div className="relative mt-4 aspect-[1200/630] overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+          <Image
             src={previewUrl}
             alt={`Vista previa de ${getSeoImageLabel(target)}`}
-            className="aspect-[1200/630] w-full object-cover"
+            fill
+            sizes="(max-width: 1024px) 100vw, 520px"
+            className="object-cover"
+            unoptimized
           />
         </div>
       ) : (
@@ -949,11 +953,16 @@ const SeoKeywordsPage = () => {
               </h2>
               <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                 {resolveSeoPreviewUrl(homeForm.ogImageUrl) ? (
-                  <img
-                    src={resolveSeoPreviewUrl(homeForm.ogImageUrl) || ""}
-                    alt="Vista previa social"
-                    className="aspect-video w-full object-cover"
-                  />
+                  <div className="relative aspect-video w-full">
+                    <Image
+                      src={resolveSeoPreviewUrl(homeForm.ogImageUrl) || ""}
+                      alt="Vista previa social"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 420px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
                 ) : (
                   <div className="flex aspect-video items-center justify-center bg-emerald-950 text-center text-xs font-black uppercase tracking-wider text-white/60">
                     Sin imagen OG
