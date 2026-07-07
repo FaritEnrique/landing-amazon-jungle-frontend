@@ -10,6 +10,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AppToaster from "./components/AppToaster";
 import LanguageSwitcher from "./components/LanguageSwitcher";
+import HtmlLangSync from "./components/HtmlLangSync";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -104,6 +105,7 @@ const RootLayout = ({
       className={`${montserrat.variable} ${playfair.variable} ${greatVibes.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden font-sans">
+        <HtmlLangSync />
         <Header />
 
         <AppToaster />

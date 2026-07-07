@@ -16,7 +16,7 @@ export interface TourPackagePayload extends TourPackageTranslation {
   overlayTitle: string;
   price: string;
 
-  imageAlt?: string;
+  imageAlt?: string | null;
   imageFile?: File | null;
 
   bottomTitle: string;
