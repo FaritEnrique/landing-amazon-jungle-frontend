@@ -120,7 +120,7 @@ const Header = () => {
               >
                 <Image
                   src="/images/logos/Logo-sbg.webp"
-                  alt="Amazon Jungle Expeditions"
+                  alt="Amazon Jungle Expeditions Lodge"
                   fill
                   sizes="(max-width: 1024px) 56px, 80px"
                   className="object-contain p-1"
@@ -148,7 +148,7 @@ const Header = () => {
                       : "text-emerald-950",
                   ].join(" ")}
                 >
-                  Expeditions
+                  Expeditions Lodge
                 </p>
               </div>
             </Link>
