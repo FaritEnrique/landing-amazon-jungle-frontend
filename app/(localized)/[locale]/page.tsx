@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import HeroCarousel from "../components/HeroCarousel";
-import ShareButtons from "../components/ShareButtons";
-import TourPackagesGrid from "../components/tours/TourPackagesGrid";
+import HeroCarousel from "../../components/HeroCarousel";
+import ShareButtons from "../../components/ShareButtons";
+import TourPackagesGrid from "../../components/tours/TourPackagesGrid";
 import { listPublicHeroSlides } from "@/lib/heroSlidesApi";
 import { copy, getLocale, type Locale } from "@/lib/i18n";
 import { getPublicLandingSeo } from "@/lib/seoApi";

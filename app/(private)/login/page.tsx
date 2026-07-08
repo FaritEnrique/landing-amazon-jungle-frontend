@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import RegisterSystemAdminForm from "../components/RegisterSystemAdminForm";
-import LoginForm from "../components/LoginForm";
+import RegisterSystemAdminForm from "../../components/RegisterSystemAdminForm";
+import LoginForm from "../../components/LoginForm";
 import { getBootstrapStatus } from "@/lib/authApi";
 
 const LoginPage = () => {
