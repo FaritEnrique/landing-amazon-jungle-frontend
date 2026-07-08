@@ -206,7 +206,7 @@ const HeroCarousel = ({ initialSlides, locale = "en" }: HeroCarouselProps) => {
             )}
 
             {hasTitle && (
-              <h1 className="font-display text-4xl font-black leading-[1.04] tracking-tight text-slate-950 drop-shadow-xl sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="font-sans text-4xl font-black leading-[1.04] tracking-tight text-slate-950 drop-shadow-xl sm:font-display sm:text-5xl md:text-6xl lg:text-7xl">
                 {titleBefore}
                 {titleHighlight && (
                   <>
