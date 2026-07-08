@@ -44,6 +44,35 @@ const resolveAbsoluteUrl = (url?: string | null) => {
   return url;
 };
 
+const getSocialImageVersion = (updatedAt?: string | Date | null) => {
+  if (!updatedAt) return undefined;
+
+  const timestamp = new Date(updatedAt).getTime();
+
+  return Number.isFinite(timestamp) ? String(timestamp) : undefined;
+};
+
+const appendUrlVersion = (url?: string, version?: string) => {
+  if (!url || !version) return url;
+
+  const separator = url.includes("?") ? "&" : "?";
+
+  return `${url}${separator}v=${encodeURIComponent(version)}`;
+};
+
+const resolveSocialImageUrl = (
+  imageUrl?: string | null,
+  fallbackUrl = DEFAULT_SOCIAL_IMAGE,
+  updatedAt?: string | Date | null,
+) => {
+  const absoluteUrl = resolveAbsoluteUrl(imageUrl) || resolveAbsoluteUrl(fallbackUrl);
+
+  return appendUrlVersion(
+    absoluteUrl,
+    imageUrl ? getSocialImageVersion(updatedAt) : undefined,
+  );
+};
+
 const getHeroSlides = async (locale: Locale) => {
   try {
     const response = await listPublicHeroSlides(locale);
@@ -98,9 +127,11 @@ const buildJsonLd = ({
   const webpageId = `${localizedUrl}#webpage`;
   const logoUrl =
     resolveAbsoluteUrl(business?.logoUrl) || resolveAbsoluteUrl(DEFAULT_LOGO_IMAGE);
-  const primaryImageUrl =
-    resolveAbsoluteUrl(metadata?.ogImageUrl) ||
-    resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
+  const primaryImageUrl = resolveSocialImageUrl(
+    metadata?.ogImageUrl,
+    DEFAULT_SOCIAL_IMAGE,
+    metadata?.updatedAt,
+  );
 
   const sameAs = [
     business?.facebookUrl,
@@ -276,12 +307,16 @@ export const generateMetadata = async ({
   const landingSeo = await getLandingSeo(locale);
   const metadata = landingSeo?.metadata;
   const localizedUrl = getLocalizedSiteUrl(locale);
-  const ogImage =
-    resolveAbsoluteUrl(metadata?.ogImageUrl) ||
-    resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
-  const twitterImage =
-    resolveAbsoluteUrl(metadata?.twitterImageUrl || metadata?.ogImageUrl) ||
-    resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
+  const ogImage = resolveSocialImageUrl(
+    metadata?.ogImageUrl,
+    DEFAULT_SOCIAL_IMAGE,
+    metadata?.updatedAt,
+  );
+  const twitterImage = resolveSocialImageUrl(
+    metadata?.twitterImageUrl || metadata?.ogImageUrl,
+    DEFAULT_SOCIAL_IMAGE,
+    metadata?.updatedAt,
+  );
   const metadataTitle = metadata?.title || "Amazon Jungle Expeditions";
   const metadataDescription =
     metadata?.description || copy[locale].contactDescription;

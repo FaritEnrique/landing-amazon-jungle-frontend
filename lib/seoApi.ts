@@ -151,9 +151,7 @@ const parseApiResponse = async <T>(response: Response): Promise<T> => {
 export const getPublicSeoMetadata = async (locale: Locale = "en") => {
   const response = await fetch(`${API_URL}/api/seo/meta?locale=${locale}`, {
     method: "GET",
-    next: {
-      revalidate: 300,
-    },
+    cache: "no-store",
   });
 
   return parseApiResponse<{
@@ -165,9 +163,7 @@ export const getPublicSeoMetadata = async (locale: Locale = "en") => {
 export const getPublicLandingSeo = async (locale: Locale = "en") => {
   const response = await fetch(`${API_URL}/api/seo/landing?locale=${locale}`, {
     method: "GET",
-    next: {
-      revalidate: 300,
-    },
+    cache: "no-store",
   });
 
   return parseApiResponse<{

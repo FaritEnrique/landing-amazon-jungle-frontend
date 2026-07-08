@@ -206,7 +206,9 @@ const getSeoImageField = (target: SeoImageTarget) => {
 };
 
 const getSeoImageLabel = (target: SeoImageTarget) => {
-  return target === "og" ? "Imagen OG / WhatsApp" : "Imagen Twitter/X";
+  return target === "og"
+    ? "Imagen OG / WhatsApp / Facebook"
+    : "Imagen Twitter/X";
 };
 
 const resolveSeoPreviewUrl = (url?: string | null) => {
