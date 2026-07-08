@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
+
 type SharePlatform = "whatsapp" | "facebook" | "twitter";
 
 interface ShareButtonsProps {
@@ -14,6 +16,13 @@ const defaultShareMessage =
 
 const openShareWindow = (shareUrl: string) => {
   window.open(shareUrl, "_blank", "noopener,noreferrer,width=720,height=640");
+};
+
+const getShareEventName = (platform: SharePlatform) => {
+  if (platform === "whatsapp") return "click_share_whatsapp";
+  if (platform === "facebook") return "click_share_facebook";
+
+  return "click_share_x";
 };
 
 const ShareButtons = ({
@@ -36,6 +45,11 @@ const ShareButtons = ({
     const currentUrl = getShareUrl();
     const encodedUrl = encodeURIComponent(currentUrl);
     const encodedMessage = encodeURIComponent(message);
+    trackEvent(getShareEventName(platform), {
+      share_platform: platform === "twitter" ? "x" : platform,
+      share_url: currentUrl,
+      page_path: window.location.pathname,
+    });
 
     if (platform === "whatsapp") {
       openShareWindow(

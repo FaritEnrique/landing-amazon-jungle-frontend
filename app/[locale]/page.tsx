@@ -17,6 +17,11 @@ const SITE_URL = (
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
 ).replace(/\/$/, "");
+const MAIN_SITE_URL = (
+  process.env.NEXT_PUBLIC_MAIN_SITE_URL ||
+  "https://www.amazonjungle-expeditions.com"
+).replace(/\/$/, "");
+const DEFAULT_LOGO_IMAGE = "/images/logos/Logo-sbg.webp";
 const DEFAULT_SOCIAL_IMAGE = "/images/og/amazon-jungle-expeditions-og.webp";
 
 const getLocalizedSiteUrl = (locale: Locale) => `${SITE_URL}/${locale}`;
@@ -84,9 +89,18 @@ const buildJsonLd = ({
   locale: Locale;
 }) => {
   const localizedUrl = getLocalizedSiteUrl(locale);
+  const language = locale === "es" ? "es-PE" : "en";
   const business = landingSeo?.business;
   const metadata = landingSeo?.metadata;
   const faqs = landingSeo?.faqs || [];
+  const organizationId = `${MAIN_SITE_URL}/#organization`;
+  const websiteId = `${MAIN_SITE_URL}/#website`;
+  const webpageId = `${localizedUrl}#webpage`;
+  const logoUrl =
+    resolveAbsoluteUrl(business?.logoUrl) || resolveAbsoluteUrl(DEFAULT_LOGO_IMAGE);
+  const primaryImageUrl =
+    resolveAbsoluteUrl(metadata?.ogImageUrl) ||
+    resolveAbsoluteUrl(DEFAULT_SOCIAL_IMAGE);
 
   const sameAs = [
     business?.facebookUrl,
@@ -98,14 +112,25 @@ const buildJsonLd = ({
   const organization = {
     "@context": "https://schema.org",
     "@type": "TravelAgency",
+    "@id": organizationId,
     name: business?.businessName || "Amazon Jungle Expeditions",
     legalName: business?.legalName || undefined,
     description: business?.description || metadata?.description,
-    url: localizedUrl,
-    logo: resolveAbsoluteUrl(business?.logoUrl),
+    url: MAIN_SITE_URL,
+    logo: logoUrl,
+    image: primaryImageUrl,
     telephone: business?.phone,
     email: business?.email,
     sameAs: sameAs.length > 0 ? sameAs : undefined,
+    contactPoint: business?.phone
+      ? {
+          "@type": "ContactPoint",
+          telephone: business.phone,
+          contactType: "reservations",
+          areaServed: ["PE", "US"],
+          availableLanguage: ["English", "Spanish"],
+        }
+      : undefined,
     address: business?.address
       ? {
           "@type": "PostalAddress",
@@ -128,9 +153,41 @@ const buildJsonLd = ({
   const website = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": websiteId,
     name: business?.businessName || "Amazon Jungle Expeditions",
-    url: localizedUrl,
+    url: MAIN_SITE_URL,
     description: metadata?.description,
+    publisher: {
+      "@id": organizationId,
+    },
+    inLanguage: ["en", "es-PE"],
+  };
+
+  const webPage = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": webpageId,
+    url: localizedUrl,
+    name: metadata?.title || business?.businessName || "Amazon Jungle Expeditions",
+    description: metadata?.description || business?.description,
+    inLanguage: language,
+    isPartOf: {
+      "@id": websiteId,
+    },
+    publisher: {
+      "@id": organizationId,
+    },
+    about: {
+      "@id": organizationId,
+    },
+    primaryImageOfPage: primaryImageUrl
+      ? {
+          "@type": "ImageObject",
+          url: primaryImageUrl,
+          width: 1200,
+          height: 630,
+        }
+      : undefined,
   };
 
   const itemList =
@@ -138,12 +195,19 @@ const buildJsonLd = ({
       ? {
           "@context": "https://schema.org",
           "@type": "ItemList",
-          name: "Amazon Jungle Expeditions tours from Iquitos",
+          "@id": `${localizedUrl}#tour-packages`,
+          name: copy[locale].toursTitle,
+          url: `${localizedUrl}#excursions`,
+          inLanguage: language,
+          isPartOf: {
+            "@id": webpageId,
+          },
           itemListElement: tours.map((tour, index) => ({
             "@type": "ListItem",
             position: index + 1,
             item: {
               "@type": "TouristTrip",
+              "@id": `${localizedUrl}#tour-${tour.id}`,
               name: tour.bottomTitle || tour.overlayTitle,
               description:
                 tour.longDescription ||
@@ -154,6 +218,9 @@ const buildJsonLd = ({
                 resolveTourPackageImageUrl(tour.imageWebpUrl),
               ),
               touristType: tour.location || "Amazon rainforest tour",
+              provider: {
+                "@id": organizationId,
+              },
               offers:
                 tour.priceAmount || tour.price
                   ? {
@@ -162,7 +229,9 @@ const buildJsonLd = ({
                       priceCurrency: tour.priceCurrency || "USD",
                       description: tour.price,
                       availability: "https://schema.org/InStock",
-                      url: localizedUrl,
+                      url: tour.buttonHref
+                        ? resolveAbsoluteUrl(tour.buttonHref) || localizedUrl
+                        : localizedUrl,
                     }
                   : undefined,
             },
@@ -175,6 +244,12 @@ const buildJsonLd = ({
       ? {
           "@context": "https://schema.org",
           "@type": "FAQPage",
+          "@id": `${localizedUrl}#faq`,
+          url: `${localizedUrl}#faq`,
+          inLanguage: language,
+          isPartOf: {
+            "@id": webpageId,
+          },
           mainEntity: faqs.map((faq) => ({
             "@type": "Question",
             name: faq.question,
@@ -186,7 +261,7 @@ const buildJsonLd = ({
         }
       : null;
 
-  return [organization, website, itemList, faqPage].filter(Boolean);
+  return [organization, website, webPage, itemList, faqPage].filter(Boolean);
 };
 
 export const generateStaticParams = () => [{ locale: "en" }, { locale: "es" }];

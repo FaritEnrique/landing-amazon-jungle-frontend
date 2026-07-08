@@ -1,43 +1,12 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import {
   listarTourPackages,
   resolveTourPackageImageUrl,
 } from "@/lib/tourPackagesApi";
 import { copy, type Locale } from "@/lib/i18n";
 import type { TourPackage } from "./tourPackageTypes";
-
-const isExternalUrl = (url: string) => {
-  return url.startsWith("http://") || url.startsWith("https://");
-};
-
-const TourPackageButton = ({
-  href,
-  label,
-}: {
-  href: string;
-  label: string;
-}) => {
-  const className =
-    "mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-[#465c12] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-[#33440d]";
-
-  if (isExternalUrl(href)) {
-    return (
-      <a href={href} target="_blank" rel="noreferrer" className={className}>
-        {label}
-        <ArrowRight size={14} aria-hidden="true" />
-      </a>
-    );
-  }
-
-  return (
-    <Link href={href} className={className}>
-      {label}
-      <ArrowRight size={14} aria-hidden="true" />
-    </Link>
-  );
-};
+import TourPackageCtaButton from "./TourPackageCtaButton";
 
 const getPublicTourPackages = async (locale: Locale) => {
   try {
@@ -172,9 +141,12 @@ const TourPackagesGrid = async ({
                   ) : null}
 
                   {hasButton && pkg.buttonLabel && pkg.buttonHref ? (
-                    <TourPackageButton
+                    <TourPackageCtaButton
                       href={pkg.buttonHref}
                       label={pkg.buttonLabel}
+                      packageId={pkg.id}
+                      packageTitle={pkg.bottomTitle || pkg.overlayTitle}
+                      locale={locale}
                     />
                   ) : null}
                 </div>

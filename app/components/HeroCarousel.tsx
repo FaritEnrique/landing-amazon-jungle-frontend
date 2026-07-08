@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { copy, type Locale } from "@/lib/i18n";
 import { resolveHeroImageUrl, type HeroSlide } from "@/lib/heroSlidesApi";
+import { trackEvent } from "@/lib/analytics";
 
 const fallbackSlidesByLocale: Record<Locale, HeroSlide[]> = {
   en: [
@@ -53,26 +54,52 @@ const fallbackSlidesByLocale: Record<Locale, HeroSlide[]> = {
 
 const AUTOPLAY_DELAY = 6500;
 
+const isWhatsAppUrl = (href: string) => {
+  return href.includes("wa.me/") || href.includes("api.whatsapp.com/");
+};
+
 const HeroActionLink = ({
   href,
   children,
+  locale,
+  slideId,
 }: {
   href: string;
   children: ReactNode;
+  locale: Locale;
+  slideId: string | number;
 }) => {
   const className =
     "inline-flex items-center justify-center rounded-full bg-amber-400 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-950 shadow-lg shadow-black/20 transition hover:bg-amber-300 sm:px-7";
 
+  const handleClick = () => {
+    if (!isWhatsAppUrl(href)) return;
+
+    trackEvent("click_whatsapp", {
+      source: "hero",
+      locale,
+      slide_id: String(slideId),
+      page_path: window.location.pathname,
+      destination_url: href,
+    });
+  };
+
   if (href.startsWith("http://") || href.startsWith("https://")) {
     return (
-      <a href={href} target="_blank" rel="noreferrer" className={className}>
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={className}
+        onClick={handleClick}
+      >
         {children}
       </a>
     );
   }
 
   return (
-    <a href={href} className={className}>
+    <a href={href} className={className} onClick={handleClick}>
       {children}
     </a>
   );
@@ -200,7 +227,11 @@ const HeroCarousel = ({
 
             {hasPrimaryButton && currentSlide.primaryButtonUrl && (
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <HeroActionLink href={currentSlide.primaryButtonUrl}>
+                <HeroActionLink
+                  href={currentSlide.primaryButtonUrl}
+                  locale={locale}
+                  slideId={currentSlide.id}
+                >
                   {currentSlide.primaryButtonText}
                 </HeroActionLink>
               </div>

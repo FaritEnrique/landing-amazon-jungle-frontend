@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import AppToaster from "./components/AppToaster";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import HtmlLangSync from "./components/HtmlLangSync";
+import AnalyticsScripts from "./components/AnalyticsScripts";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -41,6 +42,7 @@ const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
   "https://landing.amazonjungle-expeditions.com"
 ).replace(/\/$/, "");
+const DEFAULT_SOCIAL_IMAGE = `${SITE_URL}/images/og/amazon-jungle-expeditions-og.webp`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -70,12 +72,21 @@ export const metadata: Metadata = {
     locale: "en_US",
     alternateLocale: ["es_PE"],
     type: "website",
+    images: [
+      {
+        url: DEFAULT_SOCIAL_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "Amazon Jungle Expeditions rainforest tours from Iquitos",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Amazon Jungle Expeditions",
     description:
       "Guided Amazon rainforest tours and jungle lodge experiences from Iquitos, Peru.",
+    images: [DEFAULT_SOCIAL_IMAGE],
   },
   robots: {
     index: true,
@@ -106,6 +117,7 @@ const RootLayout = ({
       className={`${montserrat.variable} ${playfair.variable} ${greatVibes.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden font-sans">
+        <AnalyticsScripts />
         <HtmlLangSync />
         <Header />
 

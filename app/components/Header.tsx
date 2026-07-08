@@ -8,6 +8,7 @@ import { FaHome, FaInstagram, FaYoutube } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { LuNetwork } from "react-icons/lu";
 import { copy, getLocale } from "@/lib/i18n";
+import { trackEvent } from "@/lib/analytics";
 
 const MAIN_SITE_URL =
   process.env.NEXT_PUBLIC_MAIN_SITE_URL ||
@@ -29,6 +30,15 @@ const Header = () => {
   const isOverlayHeader = isHomePage && !hasScrolled && !isMenuOpen;
   const landingLabel =
     locale === "es" ? "Ir a la página landing" : "Go to landing home";
+
+  const handleWhatsAppClick = (source: string) => {
+    trackEvent("click_whatsapp", {
+      source,
+      locale,
+      page_path: pathname || "/",
+      destination_url: "https://wa.me/51943214093",
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,6 +72,7 @@ const Header = () => {
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-2 tracking-wide text-emerald-50 transition hover:text-white"
+              onClick={() => handleWhatsAppClick("header_desktop")}
             >
               <Phone size={15} />
               {locale === "es" ? "RESERVAR" : "BOOK"} (+51) 943214093 /
@@ -217,7 +228,10 @@ const Header = () => {
                   href="https://wa.me/51943214093"
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    handleWhatsAppClick("header_mobile");
+                    setIsMenuOpen(false);
+                  }}
                   className="rounded-xl px-4 py-3 text-emerald-700 transition hover:bg-emerald-50"
                 >
                   {t.reserveWhatsapp}
