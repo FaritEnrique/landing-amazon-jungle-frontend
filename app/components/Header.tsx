@@ -29,7 +29,7 @@ const Header = () => {
   const isHomePage = pathname === "/" || pathname === `/${locale}`;
   const isOverlayHeader = isHomePage && !hasScrolled && !isMenuOpen;
   const landingLabel =
-    locale === "es" ? "Ir a la página landing" : "Go to landing home";
+    locale === "es" ? "Ir a la pÃ¡gina landing" : "Go to landing home";
 
   const handleWhatsAppClick = (source: string) => {
     trackEvent("click_whatsapp", {
@@ -142,7 +142,7 @@ const Header = () => {
               <div className="leading-tight">
                 <p
                   className={[
-                    "font-display text-lg font-bold transition-colors sm:text-xl",
+                    "font-sans text-lg font-extrabold transition-colors sm:text-xl",
                     isOverlayHeader
                       ? "text-white drop-shadow"
                       : "text-emerald-950",
@@ -153,7 +153,7 @@ const Header = () => {
 
                 <p
                   className={[
-                    "font-display text-lg font-bold transition-colors sm:text-xl",
+                    "font-sans text-lg font-extrabold transition-colors sm:text-xl",
                     isOverlayHeader
                       ? "text-white drop-shadow"
                       : "text-emerald-950",
@@ -164,7 +164,7 @@ const Header = () => {
               </div>
             </Link>
 
-            {/* Acción desktop */}
+            {/* AcciÃ³n desktop */}
             <div className="hidden items-center gap-3 lg:flex">
               <Link
                 href={LANDING_SITE_URL}
@@ -195,7 +195,7 @@ const Header = () => {
               </Link>
             </div>
 
-            {/* Botón móvil */}
+            {/* BotÃ³n mÃ³vil */}
             <button
               type="button"
               aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
@@ -211,7 +211,7 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Menú móvil */}
+          {/* MenÃº mÃ³vil */}
           {isMenuOpen && (
             <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-xl lg:hidden">
               <nav className="flex flex-col gap-1 text-sm font-bold text-slate-700">
