@@ -111,7 +111,7 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="text-center text-[10px] text-white/30 mt-12 pt-4 border-t border-white/10 max-w-7xl mx-auto">
-        &copy; {new Date().getFullYear()} Amazon Jungle Expeditions.
+        &copy; {new Date().getFullYear()} Amazon Jungle Expeditions Loges.
       </div>
     </footer>
   );

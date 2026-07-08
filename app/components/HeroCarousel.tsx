@@ -9,25 +9,25 @@ import { trackEvent } from "@/lib/analytics";
 
 const fallbackSlidesByLocale: Record<Locale, HeroSlide[]> = {
   en: [
-  {
-    id: "fallback-amazon-hero",
-    imageUrl: "/images/hero/amazon-hero-fallback.svg",
-    altText: "Peruvian Amazon rainforest landscape",
-    eyebrow: "Departing daily from Iquitos, Peru",
-    titleBefore: "Explore the living",
-    titleHighlight: "Amazon,",
-    titleAfter: "guided by people who call it home",
-    description:
-      "Experience the rainforest from a family-run lodge, with authentic excursions, living nature, local culture and guides who know the jungle by heart.",
-    primaryButtonText: "Reserve on WhatsApp",
-    primaryButtonUrl:
-      "https://wa.me/51943214093?text=Hello%20Amazon%20Jungle%20Expeditions%2C%20I%20would%20like%20to%20make%20a%20reservation.",
-    backgroundPosition: "center center",
-    sortOrder: 0,
-    isActive: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
+    {
+      id: "fallback-amazon-hero",
+      imageUrl: "/images/hero/amazon-hero-fallback.svg",
+      altText: "Peruvian Amazon rainforest landscape",
+      eyebrow: "Departing daily from Iquitos, Peru",
+      titleBefore: "Explore the living",
+      titleHighlight: "Amazon,",
+      titleAfter: "guided by people who call it home",
+      description:
+        "Experience the rainforest from a family-run lodge, with authentic excursions, living nature, local culture and guides who know the jungle by heart.",
+      primaryButtonText: "Reserve on WhatsApp",
+      primaryButtonUrl:
+        "https://wa.me/51943214093?text=Hello%20Amazon%20Jungle%20Expeditions%2C%20I%20would%20like%20to%20make%20a%20reservation.",
+      backgroundPosition: "center center",
+      sortOrder: 0,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
   ],
   es: [
     {
@@ -110,10 +110,7 @@ interface HeroCarouselProps {
   locale?: Locale;
 }
 
-const HeroCarousel = ({
-  initialSlides,
-  locale = "en",
-}: HeroCarouselProps) => {
+const HeroCarousel = ({ initialSlides, locale = "en" }: HeroCarouselProps) => {
   const t = copy[locale];
   const fallbackSlides = fallbackSlidesByLocale[locale];
   const [slides] = useState<HeroSlide[]>(
@@ -186,7 +183,9 @@ const HeroCarousel = ({
       <Image
         key={currentSlide.id}
         src={backgroundImageUrl}
-        alt={currentSlide.altText || "Amazon Jungle Expeditions hero image"}
+        alt={
+          currentSlide.altText || "Amazon Jungle Expeditions Lodge hero image"
+        }
         fill
         priority={currentIndex === 0}
         sizes="100vw"
@@ -281,7 +280,6 @@ const HeroCarousel = ({
           </div>
         </>
       )}
-
     </section>
   );
 };

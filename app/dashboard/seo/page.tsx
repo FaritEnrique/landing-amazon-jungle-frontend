@@ -183,9 +183,19 @@ const getLengthState = (value: string, min: number, max: number) => {
   return "text-emerald-700 dark:text-emerald-400";
 };
 
-const FieldHelp = ({ value, min, max }: { value: string; min: number; max: number }) => {
+const FieldHelp = ({
+  value,
+  min,
+  max,
+}: {
+  value: string;
+  min: number;
+  max: number;
+}) => {
   return (
-    <p className={`mt-1 text-[10px] font-bold ${getLengthState(value, min, max)}`}>
+    <p
+      className={`mt-1 text-[10px] font-bold ${getLengthState(value, min, max)}`}
+    >
       {value.trim().length} caracteres. Recomendado: {min}-{max}.
     </p>
   );
@@ -213,44 +223,74 @@ const getTranslationFallback = (
   source: Partial<SeoHomePayload>,
 ): SeoHomeTranslation => {
   const fallback = defaultHomeTranslations[locale];
-  const fromRoot: Partial<SeoHomeTranslation> = locale === "en"
-    ? {
-        title: source.title,
-        description: source.description,
-        canonicalUrl: source.canonicalUrl,
-        ogTitle: source.ogTitle,
-        ogDescription: source.ogDescription,
-        twitterTitle: source.twitterTitle,
-        twitterDescription: source.twitterDescription,
-        focusKeyword: source.focusKeyword,
-        secondaryKeywords: source.secondaryKeywords,
-        shareMessage: source.shareMessage,
-      }
-    : {};
+  const fromRoot: Partial<SeoHomeTranslation> =
+    locale === "en"
+      ? {
+          title: source.title,
+          description: source.description,
+          canonicalUrl: source.canonicalUrl,
+          ogTitle: source.ogTitle,
+          ogDescription: source.ogDescription,
+          twitterTitle: source.twitterTitle,
+          twitterDescription: source.twitterDescription,
+          focusKeyword: source.focusKeyword,
+          secondaryKeywords: source.secondaryKeywords,
+          shareMessage: source.shareMessage,
+        }
+      : {};
 
   return {
     title: translations?.[locale]?.title || fromRoot.title || fallback.title,
     description:
-      translations?.[locale]?.description || fromRoot.description || fallback.description,
+      translations?.[locale]?.description ||
+      fromRoot.description ||
+      fallback.description,
     canonicalUrl:
-      translations?.[locale]?.canonicalUrl ?? fromRoot.canonicalUrl ?? fallback.canonicalUrl ?? null,
-    ogTitle: translations?.[locale]?.ogTitle ?? fromRoot.ogTitle ?? fallback.ogTitle ?? null,
+      translations?.[locale]?.canonicalUrl ??
+      fromRoot.canonicalUrl ??
+      fallback.canonicalUrl ??
+      null,
+    ogTitle:
+      translations?.[locale]?.ogTitle ??
+      fromRoot.ogTitle ??
+      fallback.ogTitle ??
+      null,
     ogDescription:
-      translations?.[locale]?.ogDescription ?? fromRoot.ogDescription ?? fallback.ogDescription ?? null,
+      translations?.[locale]?.ogDescription ??
+      fromRoot.ogDescription ??
+      fallback.ogDescription ??
+      null,
     twitterTitle:
-      translations?.[locale]?.twitterTitle ?? fromRoot.twitterTitle ?? fallback.twitterTitle ?? null,
+      translations?.[locale]?.twitterTitle ??
+      fromRoot.twitterTitle ??
+      fallback.twitterTitle ??
+      null,
     twitterDescription:
-      translations?.[locale]?.twitterDescription ?? fromRoot.twitterDescription ?? fallback.twitterDescription ?? null,
+      translations?.[locale]?.twitterDescription ??
+      fromRoot.twitterDescription ??
+      fallback.twitterDescription ??
+      null,
     focusKeyword:
-      translations?.[locale]?.focusKeyword ?? fromRoot.focusKeyword ?? fallback.focusKeyword ?? null,
+      translations?.[locale]?.focusKeyword ??
+      fromRoot.focusKeyword ??
+      fallback.focusKeyword ??
+      null,
     secondaryKeywords:
-      translations?.[locale]?.secondaryKeywords ?? fromRoot.secondaryKeywords ?? fallback.secondaryKeywords ?? null,
+      translations?.[locale]?.secondaryKeywords ??
+      fromRoot.secondaryKeywords ??
+      fallback.secondaryKeywords ??
+      null,
     shareMessage:
-      translations?.[locale]?.shareMessage ?? fromRoot.shareMessage ?? fallback.shareMessage ?? null,
+      translations?.[locale]?.shareMessage ??
+      fromRoot.shareMessage ??
+      fallback.shareMessage ??
+      null,
   };
 };
 
-const ensureHomeTranslations = (home: Partial<SeoHomePayload>): SeoHomePayload => {
+const ensureHomeTranslations = (
+  home: Partial<SeoHomePayload>,
+): SeoHomePayload => {
   const translations = {
     en: getTranslationFallback(home.translations, "en", home),
     es: getTranslationFallback(home.translations, "es", home),
@@ -292,7 +332,9 @@ const validateHomePayload = (home: SeoHomePayload) => {
   return null;
 };
 
-const getFaqTranslations = (faq?: Partial<SeoFaq>): Record<Locale, SeoFaqTranslation> => ({
+const getFaqTranslations = (
+  faq?: Partial<SeoFaq>,
+): Record<Locale, SeoFaqTranslation> => ({
   en: {
     question: faq?.translations?.en?.question || faq?.question || "",
     answer: faq?.translations?.en?.answer || faq?.answer || "",
@@ -309,7 +351,10 @@ interface SeoImageManagerProps {
   placeholder: string;
   isBusy: boolean;
   onUrlChange: (value: string) => void;
-  onUpload: (target: SeoImageTarget, event: ChangeEvent<HTMLInputElement>) => void;
+  onUpload: (
+    target: SeoImageTarget,
+    event: ChangeEvent<HTMLInputElement>,
+  ) => void;
   onDelete: (target: SeoImageTarget) => void;
 }
 
@@ -405,25 +450,42 @@ const SeoKeywordsPage = () => {
   const [activeSection, setActiveSection] = useState<ActiveSection>("landing");
   const [activeLocale, setActiveLocale] = useState<Locale>("en");
   const [homeForm, setHomeForm] = useState<SeoHomePayload>(emptyHomeForm);
-  const [businessForm, setBusinessForm] = useState<SeoBusinessProfilePayload>(emptyBusinessForm);
+  const [businessForm, setBusinessForm] =
+    useState<SeoBusinessProfilePayload>(emptyBusinessForm);
   const [faqs, setFaqs] = useState<SeoFaq[]>([]);
   const [faqForm, setFaqForm] = useState<FaqFormState>(emptyFaqForm);
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
   const [keywords, setKeywords] = useState<SeoKeyword[]>([]);
   const [keywordSearch, setKeywordSearch] = useState("");
-  const [keywordForm, setKeywordForm] = useState<KeywordFormState>(emptyKeywordForm);
+  const [keywordForm, setKeywordForm] =
+    useState<KeywordFormState>(emptyKeywordForm);
   const [editingKeywordId, setEditingKeywordId] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [busyImageTarget, setBusyImageTarget] = useState<SeoImageTarget | null>(null);
+  const [busyImageTarget, setBusyImageTarget] = useState<SeoImageTarget | null>(
+    null,
+  );
 
-  const activeKeywords = useMemo(() => keywords.filter((keyword) => keyword.isActive).length, [keywords]);
-  const activeFaqs = useMemo(() => faqs.filter((faq) => faq.isActive).length, [faqs]);
-  const currentHomeTranslation = getTranslationFallback(homeForm.translations, activeLocale, homeForm);
+  const activeKeywords = useMemo(
+    () => keywords.filter((keyword) => keyword.isActive).length,
+    [keywords],
+  );
+  const activeFaqs = useMemo(
+    () => faqs.filter((faq) => faq.isActive).length,
+    [faqs],
+  );
+  const currentHomeTranslation = getTranslationFallback(
+    homeForm.translations,
+    activeLocale,
+    homeForm,
+  );
   const currentFaqTranslation = faqForm.translations[activeLocale];
 
-  const setHomeTranslationField = (field: HomeTranslationKey, value: string) => {
+  const setHomeTranslationField = (
+    field: HomeTranslationKey,
+    value: string,
+  ) => {
     setHomeForm((current) => {
       const translations = {
         en: getTranslationFallback(current.translations, "en", current),
@@ -448,7 +510,10 @@ const SeoKeywordsPage = () => {
     });
   };
 
-  const setFaqTranslationField = (field: keyof SeoFaqTranslation, value: string) => {
+  const setFaqTranslationField = (
+    field: keyof SeoFaqTranslation,
+    value: string,
+  ) => {
     setFaqForm((current) => ({
       ...current,
       translations: {
@@ -473,11 +538,17 @@ const SeoKeywordsPage = () => {
       ]);
 
       setHomeForm(ensureHomeTranslations(normalizeNullableForm(home.data)));
-      setBusinessForm({ ...emptyBusinessForm, ...normalizeNullableForm(business.data) });
+      setBusinessForm({
+        ...emptyBusinessForm,
+        ...normalizeNullableForm(business.data),
+      });
       setFaqs(faqResponse.faqs);
       setKeywords(keywordResponse.keywords);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo cargar la configuración SEO";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo cargar la configuración SEO";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -520,14 +591,20 @@ const SeoKeywordsPage = () => {
       toast.success("SEO bilingüe de la landing actualizado correctamente");
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo actualizar el SEO de la landing";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo actualizar el SEO de la landing";
       toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleUploadSeoImage = async (target: SeoImageTarget, event: ChangeEvent<HTMLInputElement>) => {
+  const handleUploadSeoImage = async (
+    target: SeoImageTarget,
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     event.target.value = "";
 
@@ -546,7 +623,10 @@ const SeoKeywordsPage = () => {
       toast.success(response.message || "Imagen SEO actualizada correctamente");
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo cargar la imagen SEO";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo cargar la imagen SEO";
       toast.error(message);
     } finally {
       setBusyImageTarget(null);
@@ -566,7 +646,10 @@ const SeoKeywordsPage = () => {
       toast.success(response.message || "Imagen SEO eliminada correctamente");
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo borrar la imagen SEO";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo borrar la imagen SEO";
       toast.error(message);
     } finally {
       setBusyImageTarget(null);
@@ -584,12 +667,17 @@ const SeoKeywordsPage = () => {
     setIsSubmitting(true);
 
     try {
-      const payload = normalizeNullableForm(businessForm) as SeoBusinessProfilePayload;
+      const payload = normalizeNullableForm(
+        businessForm,
+      ) as SeoBusinessProfilePayload;
       await updateSeoBusinessProfile(payload);
       toast.success("Perfil del negocio actualizado correctamente");
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo actualizar el perfil del negocio";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo actualizar el perfil del negocio";
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -643,7 +731,10 @@ const SeoKeywordsPage = () => {
       resetFaqForm();
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo guardar la pregunta frecuente";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar la pregunta frecuente";
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -667,7 +758,10 @@ const SeoKeywordsPage = () => {
       toast.success("Pregunta frecuente eliminada");
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo eliminar la pregunta frecuente";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar la pregunta frecuente";
       toast.error(message);
     }
   };
@@ -707,7 +801,10 @@ const SeoKeywordsPage = () => {
       resetKeywordForm();
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo guardar la frase objetivo";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar la frase objetivo";
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -733,7 +830,10 @@ const SeoKeywordsPage = () => {
       toast.success("Frase objetivo eliminada");
       await loadSeoData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo eliminar la frase objetivo";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar la frase objetivo";
       toast.error(message);
     }
   };
@@ -786,20 +886,29 @@ const SeoKeywordsPage = () => {
               </h1>
 
               <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                Administra metadata, Open Graph, FAQs y frases objetivo por idioma.
-                La landing pública consume <strong>/en</strong> y <strong>/es</strong> sin mezclar contenido.
+                Administra metadata, Open Graph, FAQs y frases objetivo por
+                idioma. La landing pública consume <strong>/en</strong> y{" "}
+                <strong>/es</strong> sin mezclar contenido.
               </p>
             </div>
 
             <div className="grid grid-cols-3 gap-3 sm:min-w-96">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
-                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">FAQs activas</p>
-                <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{activeFaqs}</p>
+                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  FAQs activas
+                </p>
+                <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">
+                  {activeFaqs}
+                </p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
-                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Frases activas</p>
-                <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-400">{activeKeywords}</p>
+                <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  Frases activas
+                </p>
+                <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-400">
+                  {activeKeywords}
+                </p>
               </div>
 
               <button
@@ -808,7 +917,10 @@ const SeoKeywordsPage = () => {
                 disabled={isLoading}
                 className="rounded-2xl border border-emerald-700 px-4 py-3 text-xs font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
               >
-                <RefreshCw size={16} className={`mx-auto mb-1 ${isLoading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  size={16}
+                  className={`mx-auto mb-1 ${isLoading ? "animate-spin" : ""}`}
+                />
                 Recargar
               </button>
             </div>
@@ -843,7 +955,10 @@ const SeoKeywordsPage = () => {
         ) : null}
 
         {activeSection === "landing" ? (
-          <form onSubmit={handleSaveHome} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <form
+            onSubmit={handleSaveHome}
+            className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]"
+          >
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
               <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
                 Metadata principal — {localeLabels[activeLocale]}
@@ -855,10 +970,16 @@ const SeoKeywordsPage = () => {
               <input
                 aria-label="Título SEO"
                 value={currentHomeTranslation.title}
-                onChange={(event) => setHomeTranslationField("title", event.target.value)}
+                onChange={(event) =>
+                  setHomeTranslationField("title", event.target.value)
+                }
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
-              <FieldHelp value={currentHomeTranslation.title} min={45} max={65} />
+              <FieldHelp
+                value={currentHomeTranslation.title}
+                min={45}
+                max={65}
+              />
 
               <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Meta description
@@ -866,18 +987,31 @@ const SeoKeywordsPage = () => {
               <textarea
                 aria-label="Meta description"
                 value={currentHomeTranslation.description}
-                onChange={(event) => setHomeTranslationField("description", event.target.value)}
+                onChange={(event) =>
+                  setHomeTranslationField("description", event.target.value)
+                }
                 rows={4}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
-              <FieldHelp value={currentHomeTranslation.description} min={120} max={160} />
+              <FieldHelp
+                value={currentHomeTranslation.description}
+                min={120}
+                max={160}
+              />
 
               <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Canonical URL</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Canonical URL
+                  </span>
                   <input
                     value={currentHomeTranslation.canonicalUrl || ""}
-                    onChange={(event) => setHomeTranslationField("canonicalUrl", event.target.value)}
+                    onChange={(event) =>
+                      setHomeTranslationField(
+                        "canonicalUrl",
+                        event.target.value,
+                      )
+                    }
                     placeholder={`${SITE_URL}/${activeLocale}`}
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
@@ -888,7 +1022,9 @@ const SeoKeywordsPage = () => {
                   value={homeForm.ogImageUrl}
                   placeholder="/uploads/seo/images/archivo.jpg o URL absoluta"
                   isBusy={busyImageTarget === "og"}
-                  onUrlChange={(value) => setHomeForm({ ...homeForm, ogImageUrl: value })}
+                  onUrlChange={(value) =>
+                    setHomeForm({ ...homeForm, ogImageUrl: value })
+                  }
                   onUpload={handleUploadSeoImage}
                   onDelete={handleDeleteSeoImage}
                 />
@@ -896,10 +1032,14 @@ const SeoKeywordsPage = () => {
 
               <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">OG title</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    OG title
+                  </span>
                   <input
                     value={currentHomeTranslation.ogTitle || ""}
-                    onChange={(event) => setHomeTranslationField("ogTitle", event.target.value)}
+                    onChange={(event) =>
+                      setHomeTranslationField("ogTitle", event.target.value)
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
@@ -909,17 +1049,23 @@ const SeoKeywordsPage = () => {
                   value={homeForm.twitterImageUrl}
                   placeholder="Vacío usa la imagen OG"
                   isBusy={busyImageTarget === "twitter"}
-                  onUrlChange={(value) => setHomeForm({ ...homeForm, twitterImageUrl: value })}
+                  onUrlChange={(value) =>
+                    setHomeForm({ ...homeForm, twitterImageUrl: value })
+                  }
                   onUpload={handleUploadSeoImage}
                   onDelete={handleDeleteSeoImage}
                 />
               </div>
 
-              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">OG description</label>
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                OG description
+              </label>
               <textarea
                 aria-label="OG description"
                 value={currentHomeTranslation.ogDescription || ""}
-                onChange={(event) => setHomeTranslationField("ogDescription", event.target.value)}
+                onChange={(event) =>
+                  setHomeTranslationField("ogDescription", event.target.value)
+                }
                 rows={3}
                 placeholder="Vacío usa la meta description"
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
@@ -927,47 +1073,79 @@ const SeoKeywordsPage = () => {
 
               <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Twitter title</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Twitter title
+                  </span>
                   <input
                     value={currentHomeTranslation.twitterTitle || ""}
-                    onChange={(event) => setHomeTranslationField("twitterTitle", event.target.value)}
+                    onChange={(event) =>
+                      setHomeTranslationField(
+                        "twitterTitle",
+                        event.target.value,
+                      )
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Twitter description</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Twitter description
+                  </span>
                   <input
                     value={currentHomeTranslation.twitterDescription || ""}
-                    onChange={(event) => setHomeTranslationField("twitterDescription", event.target.value)}
+                    onChange={(event) =>
+                      setHomeTranslationField(
+                        "twitterDescription",
+                        event.target.value,
+                      )
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
               </div>
 
-              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Mensaje de compartir</label>
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Mensaje de compartir
+              </label>
               <textarea
                 aria-label="Mensaje de compartir"
                 value={currentHomeTranslation.shareMessage || ""}
-                onChange={(event) => setHomeTranslationField("shareMessage", event.target.value)}
+                onChange={(event) =>
+                  setHomeTranslationField("shareMessage", event.target.value)
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
 
               <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Frase principal</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Frase principal
+                  </span>
                   <input
                     value={currentHomeTranslation.focusKeyword || ""}
-                    onChange={(event) => setHomeTranslationField("focusKeyword", event.target.value)}
+                    onChange={(event) =>
+                      setHomeTranslationField(
+                        "focusKeyword",
+                        event.target.value,
+                      )
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
 
                 <label className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Frases secundarias</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Frases secundarias
+                  </span>
                   <input
                     value={currentHomeTranslation.secondaryKeywords || ""}
-                    onChange={(event) => setHomeTranslationField("secondaryKeywords", event.target.value)}
+                    onChange={(event) =>
+                      setHomeTranslationField(
+                        "secondaryKeywords",
+                        event.target.value,
+                      )
+                    }
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
@@ -978,7 +1156,12 @@ const SeoKeywordsPage = () => {
                   <input
                     type="checkbox"
                     checked={homeForm.robotsIndex}
-                    onChange={(event) => setHomeForm({ ...homeForm, robotsIndex: event.target.checked })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        robotsIndex: event.target.checked,
+                      })
+                    }
                     className="h-4 w-4 accent-emerald-700"
                   />
                   Indexar landing pública
@@ -988,7 +1171,12 @@ const SeoKeywordsPage = () => {
                   <input
                     type="checkbox"
                     checked={homeForm.robotsFollow}
-                    onChange={(event) => setHomeForm({ ...homeForm, robotsFollow: event.target.checked })}
+                    onChange={(event) =>
+                      setHomeForm({
+                        ...homeForm,
+                        robotsFollow: event.target.checked,
+                      })
+                    }
                     className="h-4 w-4 accent-emerald-700"
                   />
                   Permitir follow
@@ -1006,15 +1194,26 @@ const SeoKeywordsPage = () => {
             </section>
 
             <aside className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-              <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">Vista previa Google</h2>
+              <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                Vista previa Google
+              </h2>
 
               <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
-                <p className="truncate text-xs text-emerald-700 dark:text-emerald-400">{currentHomeTranslation.canonicalUrl || `${SITE_URL}/${activeLocale}`}</p>
-                <p className="mt-1 text-lg font-semibold leading-snug text-blue-700 dark:text-blue-400">{currentHomeTranslation.title || "Título SEO"}</p>
-                <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{currentHomeTranslation.description || "Descripción SEO"}</p>
+                <p className="truncate text-xs text-emerald-700 dark:text-emerald-400">
+                  {currentHomeTranslation.canonicalUrl ||
+                    `${SITE_URL}/${activeLocale}`}
+                </p>
+                <p className="mt-1 text-lg font-semibold leading-snug text-blue-700 dark:text-blue-400">
+                  {currentHomeTranslation.title || "Título SEO"}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                  {currentHomeTranslation.description || "Descripción SEO"}
+                </p>
               </div>
 
-              <h2 className="mt-6 text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">Vista previa social</h2>
+              <h2 className="mt-6 text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                Vista previa social
+              </h2>
               <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                 {resolveSeoPreviewUrl(homeForm.ogImageUrl) ? (
                   <div className="relative aspect-video w-full">
@@ -1033,8 +1232,14 @@ const SeoKeywordsPage = () => {
                   </div>
                 )}
                 <div className="p-4">
-                  <p className="text-sm font-black text-slate-900 dark:text-white">{currentHomeTranslation.ogTitle || currentHomeTranslation.title}</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{currentHomeTranslation.ogDescription || currentHomeTranslation.description}</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white">
+                    {currentHomeTranslation.ogTitle ||
+                      currentHomeTranslation.title}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                    {currentHomeTranslation.ogDescription ||
+                      currentHomeTranslation.description}
+                  </p>
                 </div>
               </div>
             </aside>
@@ -1042,12 +1247,21 @@ const SeoKeywordsPage = () => {
         ) : null}
 
         {activeSection === "business" ? (
-          <form onSubmit={handleSaveBusiness} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-            <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">Perfil del negocio para JSON-LD</h2>
+          <form
+            onSubmit={handleSaveBusiness}
+            className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6"
+          >
+            <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+              Perfil del negocio para JSON-LD
+            </h2>
 
             <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
               {[
-                ["businessName", "Nombre comercial", "Amazon Jungle Expeditions"],
+                [
+                  "businessName",
+                  "Nombre comercial",
+                  "Amazon Jungle Expeditions",
+                ],
                 ["legalName", "Razón social", ""],
                 ["ruc", "RUC", ""],
                 ["phone", "Teléfono", "+51 943214093"],
@@ -1066,10 +1280,20 @@ const SeoKeywordsPage = () => {
                 ["youtubeUrl", "YouTube", "https://youtube.com/..."],
               ].map(([key, label, placeholder]) => (
                 <label key={key} className="block">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    {label}
+                  </span>
                   <input
-                    value={String(businessForm[key as keyof SeoBusinessProfilePayload] || "")}
-                    onChange={(event) => setBusinessForm({ ...businessForm, [key]: event.target.value })}
+                    value={String(
+                      businessForm[key as keyof SeoBusinessProfilePayload] ||
+                        "",
+                    )}
+                    onChange={(event) =>
+                      setBusinessForm({
+                        ...businessForm,
+                        [key]: event.target.value,
+                      })
+                    }
                     placeholder={placeholder}
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
                   />
@@ -1077,11 +1301,18 @@ const SeoKeywordsPage = () => {
               ))}
             </div>
 
-            <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Descripción del negocio</label>
+            <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Descripción del negocio
+            </label>
             <textarea
               aria-label="Descripción del negocio"
               value={businessForm.description || ""}
-              onChange={(event) => setBusinessForm({ ...businessForm, description: event.target.value })}
+              onChange={(event) =>
+                setBusinessForm({
+                  ...businessForm,
+                  description: event.target.value,
+                })
+              }
               rows={4}
               className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
             />
@@ -1099,47 +1330,74 @@ const SeoKeywordsPage = () => {
 
         {activeSection === "faqs" ? (
           <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-            <form onSubmit={handleSaveFaq} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+            <form
+              onSubmit={handleSaveFaq}
+              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
-                    {editingFaqId ? "Editar FAQ" : "Nueva FAQ"} — {localeLabels[activeLocale]}
+                    {editingFaqId ? "Editar FAQ" : "Nueva FAQ"} —{" "}
+                    {localeLabels[activeLocale]}
                   </h2>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">Se muestra en la landing y alimenta FAQPage JSON-LD por idioma.</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    Se muestra en la landing y alimenta FAQPage JSON-LD por
+                    idioma.
+                  </p>
                 </div>
 
                 {editingFaqId ? (
-                  <button type="button" onClick={resetFaqForm} className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:text-red-600 dark:border-slate-800" aria-label="Cancelar edición">
+                  <button
+                    type="button"
+                    onClick={resetFaqForm}
+                    className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:text-red-600 dark:border-slate-800"
+                    aria-label="Cancelar edición"
+                  >
                     <X size={16} />
                   </button>
                 ) : null}
               </div>
 
-              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Pregunta</label>
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Pregunta
+              </label>
               <textarea
                 aria-label="Pregunta frecuente"
                 value={currentFaqTranslation.question}
-                onChange={(event) => setFaqTranslationField("question", event.target.value)}
+                onChange={(event) =>
+                  setFaqTranslationField("question", event.target.value)
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
 
-              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Respuesta</label>
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Respuesta
+              </label>
               <textarea
                 aria-label="Respuesta frecuente"
                 value={currentFaqTranslation.answer}
-                onChange={(event) => setFaqTranslationField("answer", event.target.value)}
+                onChange={(event) =>
+                  setFaqTranslationField("answer", event.target.value)
+                }
                 rows={5}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
 
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <label className="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                  <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Orden</span>
+                  <span className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Orden
+                  </span>
                   <input
                     type="number"
                     value={faqForm.position}
-                    onChange={(event) => setFaqForm({ ...faqForm, position: Number(event.target.value) })}
+                    onChange={(event) =>
+                      setFaqForm({
+                        ...faqForm,
+                        position: Number(event.target.value),
+                      })
+                    }
                     className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-emerald-700 dark:border-slate-800 dark:bg-slate-950"
                   />
                 </label>
@@ -1148,7 +1406,9 @@ const SeoKeywordsPage = () => {
                   <input
                     type="checkbox"
                     checked={faqForm.isActive}
-                    onChange={(event) => setFaqForm({ ...faqForm, isActive: event.target.checked })}
+                    onChange={(event) =>
+                      setFaqForm({ ...faqForm, isActive: event.target.checked })
+                    }
                     className="h-4 w-4 accent-emerald-700"
                   />
                   Activa
@@ -1161,16 +1421,24 @@ const SeoKeywordsPage = () => {
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
               >
                 {editingFaqId ? <Save size={16} /> : <Plus size={16} />}
-                {isSubmitting ? "Guardando..." : editingFaqId ? "Guardar FAQ bilingüe" : "Registrar FAQ bilingüe"}
+                {isSubmitting
+                  ? "Guardando..."
+                  : editingFaqId
+                    ? "Guardar FAQ bilingüe"
+                    : "Registrar FAQ bilingüe"}
               </button>
             </form>
 
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-              <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">Preguntas frecuentes registradas</h2>
+              <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                Preguntas frecuentes registradas
+              </h2>
 
               <div className="mt-5 space-y-3">
                 {faqs.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-400 dark:border-slate-700">No hay preguntas frecuentes registradas.</div>
+                  <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-400 dark:border-slate-700">
+                    No hay preguntas frecuentes registradas.
+                  </div>
                 ) : null}
 
                 {faqs.map((faq) => {
@@ -1178,25 +1446,49 @@ const SeoKeywordsPage = () => {
                   const current = translations[activeLocale];
 
                   return (
-                    <article key={faq.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                    <article
+                      key={faq.id}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950"
+                    >
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <div className="flex flex-wrap gap-2">
-                            <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${faq.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${faq.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}
+                            >
                               {faq.isActive ? "Activa" : "Inactiva"}
                             </span>
-                            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-800">Orden {faq.position}</span>
-                            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-800">{activeLocale.toUpperCase()}</span>
+                            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-800">
+                              Orden {faq.position}
+                            </span>
+                            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-800">
+                              {activeLocale.toUpperCase()}
+                            </span>
                           </div>
-                          <h3 className="mt-3 text-sm font-black text-slate-900 dark:text-white">{current.question || "Traducción pendiente"}</h3>
-                          <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{current.answer || "Complete esta traducción para publicarla correctamente."}</p>
+                          <h3 className="mt-3 text-sm font-black text-slate-900 dark:text-white">
+                            {current.question || "Traducción pendiente"}
+                          </h3>
+                          <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                            {current.answer ||
+                              "Complete esta traducción para publicarla correctamente."}
+                          </p>
                         </div>
 
                         <div className="flex shrink-0 gap-2">
-                          <button type="button" onClick={() => handleEditFaq(faq)} className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800" aria-label="Editar FAQ">
+                          <button
+                            type="button"
+                            onClick={() => handleEditFaq(faq)}
+                            className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800"
+                            aria-label="Editar FAQ"
+                          >
                             <Pencil size={15} />
                           </button>
-                          <button type="button" onClick={() => void handleDeleteFaq(faq)} className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/40" aria-label="Eliminar FAQ">
+                          <button
+                            type="button"
+                            onClick={() => void handleDeleteFaq(faq)}
+                            className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/40"
+                            aria-label="Eliminar FAQ"
+                          >
                             <Trash2 size={15} />
                           </button>
                         </div>
@@ -1211,56 +1503,93 @@ const SeoKeywordsPage = () => {
 
         {activeSection === "keywords" ? (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
-            <form onSubmit={handleSaveKeyword} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+            <form
+              onSubmit={handleSaveKeyword}
+              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">{editingKeywordId ? "Editar frase" : "Nueva frase"}</h2>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">Registra frases por idioma para orientar el contenido visible y metadata.</p>
+                  <h2 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                    {editingKeywordId ? "Editar frase" : "Nueva frase"}
+                  </h2>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    Registra frases por idioma para orientar el contenido
+                    visible y metadata.
+                  </p>
                 </div>
 
                 {editingKeywordId ? (
-                  <button type="button" onClick={resetKeywordForm} className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:text-red-600 dark:border-slate-800" aria-label="Cancelar edición">
+                  <button
+                    type="button"
+                    onClick={resetKeywordForm}
+                    className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:text-red-600 dark:border-slate-800"
+                    aria-label="Cancelar edición"
+                  >
                     <X size={16} />
                   </button>
                 ) : null}
               </div>
 
-              <label htmlFor="keyword-locale" className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Idioma de la frase</label>
+              <label
+                htmlFor="keyword-locale"
+                className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400"
+              >
+                Idioma de la frase
+              </label>
               <select
                 id="keyword-locale"
                 aria-label="Idioma de la frase"
                 value={keywordForm.locale}
-                onChange={(event) => setKeywordForm({ ...keywordForm, locale: event.target.value as Locale })}
+                onChange={(event) =>
+                  setKeywordForm({
+                    ...keywordForm,
+                    locale: event.target.value as Locale,
+                  })
+                }
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 dark:border-slate-800 dark:bg-slate-950"
               >
                 {LOCALES.map((locale) => (
-                  <option key={locale} value={locale}>{localeLabels[locale]}</option>
+                  <option key={locale} value={locale}>
+                    {localeLabels[locale]}
+                  </option>
                 ))}
               </select>
 
-              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Palabra o frase objetivo</label>
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Palabra o frase objetivo
+              </label>
               <textarea
                 aria-label="Palabra o frase objetivo"
                 value={keywordForm.phrase}
-                onChange={(event) => setKeywordForm({ ...keywordForm, phrase: event.target.value })}
+                onChange={(event) =>
+                  setKeywordForm({ ...keywordForm, phrase: event.target.value })
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
 
-              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Fuente</label>
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Fuente
+              </label>
               <input
                 aria-label="Fuente de la frase objetivo"
                 value={keywordForm.source}
-                onChange={(event) => setKeywordForm({ ...keywordForm, source: event.target.value })}
+                onChange={(event) =>
+                  setKeywordForm({ ...keywordForm, source: event.target.value })
+                }
                 placeholder="WhatsApp, entrevista, Google, recomendación..."
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
 
-              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Notas internas</label>
+              <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Notas internas
+              </label>
               <textarea
                 aria-label="Notas internas de la frase objetivo"
                 value={keywordForm.notes}
-                onChange={(event) => setKeywordForm({ ...keywordForm, notes: event.target.value })}
+                onChange={(event) =>
+                  setKeywordForm({ ...keywordForm, notes: event.target.value })
+                }
                 rows={3}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
@@ -1269,7 +1598,12 @@ const SeoKeywordsPage = () => {
                 <input
                   type="checkbox"
                   checked={keywordForm.isActive}
-                  onChange={(event) => setKeywordForm({ ...keywordForm, isActive: event.target.checked })}
+                  onChange={(event) =>
+                    setKeywordForm({
+                      ...keywordForm,
+                      isActive: event.target.checked,
+                    })
+                  }
                   className="h-4 w-4 accent-emerald-700"
                 />
                 Activa como frase objetivo
@@ -1281,12 +1615,19 @@ const SeoKeywordsPage = () => {
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-800 px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-emerald-900 disabled:opacity-60"
               >
                 {editingKeywordId ? <Save size={16} /> : <Plus size={16} />}
-                {isSubmitting ? "Guardando..." : editingKeywordId ? "Guardar frase" : "Registrar frase"}
+                {isSubmitting
+                  ? "Guardando..."
+                  : editingKeywordId
+                    ? "Guardar frase"
+                    : "Registrar frase"}
               </button>
             </form>
 
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-              <form onSubmit={handleKeywordSearch} className="mb-5 flex flex-col gap-3 sm:flex-row">
+              <form
+                onSubmit={handleKeywordSearch}
+                className="mb-5 flex flex-col gap-3 sm:flex-row"
+              >
                 <input
                   aria-label="Buscar frase objetivo"
                   type="search"
@@ -1296,7 +1637,11 @@ const SeoKeywordsPage = () => {
                   className="min-h-11 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-900 transition-colors focus:border-emerald-800 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                 />
 
-                <button type="submit" disabled={isLoading} className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-700 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-700 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-800 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400"
+                >
                   <Search size={15} />
                   Buscar
                 </button>
@@ -1304,28 +1649,59 @@ const SeoKeywordsPage = () => {
 
               <div className="space-y-3">
                 {keywords.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-400 dark:border-slate-700">No hay frases objetivo registradas.</div>
+                  <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-400 dark:border-slate-700">
+                    No hay frases objetivo registradas.
+                  </div>
                 ) : null}
 
                 {keywords.map((keyword) => (
-                  <article key={keyword.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                  <article
+                    key={keyword.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950"
+                  >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${keyword.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}>{keyword.isActive ? "Activa" : "Inactiva"}</span>
-                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-800">{(keyword.locale || "en").toUpperCase()}</span>
-                          {keyword.source ? <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-800">{keyword.source}</span> : null}
+                          <span
+                            className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${keyword.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"}`}
+                          >
+                            {keyword.isActive ? "Activa" : "Inactiva"}
+                          </span>
+                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-800">
+                            {(keyword.locale || "en").toUpperCase()}
+                          </span>
+                          {keyword.source ? (
+                            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-800">
+                              {keyword.source}
+                            </span>
+                          ) : null}
                         </div>
 
-                        <h3 className="mt-3 break-words text-sm font-black text-slate-900 dark:text-white">{keyword.phrase}</h3>
-                        {keyword.notes ? <p className="mt-2 break-words text-xs leading-relaxed text-slate-500 dark:text-slate-400">{keyword.notes}</p> : null}
+                        <h3 className="mt-3 break-words text-sm font-black text-slate-900 dark:text-white">
+                          {keyword.phrase}
+                        </h3>
+                        {keyword.notes ? (
+                          <p className="mt-2 break-words text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                            {keyword.notes}
+                          </p>
+                        ) : null}
                       </div>
 
                       <div className="flex shrink-0 gap-2">
-                        <button type="button" onClick={() => handleEditKeyword(keyword)} className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800" aria-label="Editar frase">
+                        <button
+                          type="button"
+                          onClick={() => handleEditKeyword(keyword)}
+                          className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-700 hover:text-emerald-800 dark:border-slate-800"
+                          aria-label="Editar frase"
+                        >
                           <Pencil size={15} />
                         </button>
-                        <button type="button" onClick={() => void handleDeleteKeyword(keyword)} className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/40" aria-label="Eliminar frase">
+                        <button
+                          type="button"
+                          onClick={() => void handleDeleteKeyword(keyword)}
+                          className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/40"
+                          aria-label="Eliminar frase"
+                        >
                           <Trash2 size={15} />
                         </button>
                       </div>

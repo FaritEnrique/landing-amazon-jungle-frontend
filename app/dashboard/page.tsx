@@ -62,7 +62,7 @@ const DashboardPage = () => {
         </h1>
 
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Sesión iniciada correctamente en el Amazon Jungle Expeditions.
+          Sesión iniciada correctamente en el Amazon Jungle Expeditions Lodge.
         </p>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -156,7 +156,8 @@ const DashboardPage = () => {
               </h2>
 
               <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-                Crea operadores para que puedan editar SEO, carrusel y paquetes turísticos sin acceder a la gestión de usuarios.
+                Crea operadores para que puedan editar SEO, carrusel y paquetes
+                turísticos sin acceder a la gestión de usuarios.
               </p>
 
               <Link
