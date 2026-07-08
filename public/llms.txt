@@ -1,0 +1,28 @@
+# Amazon Jungle Expeditions
+
+Amazon Jungle Expeditions is a tourism and lodge experience based in Iquitos, Loreto, Peru. The website presents Amazon rainforest tours, lodge information, contact options, reservation links, FAQs, and language-specific landing pages.
+
+## Main URLs
+
+- English landing page: https://landing.amazonjungle-expeditions.com/en
+- Spanish landing page: https://landing.amazonjungle-expeditions.com/es
+- Main website: https://www.amazonjungle-expeditions.com
+- Sitemap: https://landing.amazonjungle-expeditions.com/sitemap.xml
+
+## Business context
+
+Amazon Jungle Expeditions offers guided Amazon rainforest experiences, lodge stays, nature tours, local culture activities, and reservation assistance through WhatsApp and email.
+
+## Important sections
+
+- Hero / main reservation call to action
+- Tour packages
+- FAQ
+- Contact and social sharing
+- Language switcher EN / ES
+
+## Contact
+
+- WhatsApp: +51 943214093
+- Email: reservas@amazonjungle-expeditions.com
+- Location: Iquitos, Loreto, Peru
