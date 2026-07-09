@@ -37,6 +37,10 @@ export const copy = {
     shareTitle: "Share this experience",
     shareDescription:
       "Invite friends and travelers to discover the Amazon from Iquitos.",
+    faqCtaTitle: "Frequently asked questions",
+    faqCtaDescription:
+      "Find answers about safety, weather, what to pack and booking.",
+    faqCtaButton: "View all frequently asked questions",
     defaultShareMessage:
       "Discover Amazon Jungle Expeditions: authentic rainforest experiences departing from Iquitos, Peru.",
     reserveWhatsapp: "Reserve on WhatsApp",
@@ -72,6 +76,10 @@ export const copy = {
     shareTitle: "Comparte esta experiencia",
     shareDescription:
       "Invita a tus amigos y viajeros a descubrir la Amazonía desde Iquitos.",
+    faqCtaTitle: "Preguntas frecuentes",
+    faqCtaDescription:
+      "Resuelve dudas sobre seguridad, clima, qué llevar y reservas.",
+    faqCtaButton: "Ver todas las preguntas frecuentes",
     defaultShareMessage:
       "Descubre Amazon Jungle Expeditions: experiencias auténticas en la selva amazónica desde Iquitos, Perú.",
     reserveWhatsapp: "Reservar por WhatsApp",

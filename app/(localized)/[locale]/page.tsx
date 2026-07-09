@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import HeroCarousel from "../../components/HeroCarousel";
 import ShareButtons from "../../components/ShareButtons";
 import TourPackagesGrid from "../../components/tours/TourPackagesGrid";
 import { listPublicHeroSlides } from "@/lib/heroSlidesApi";
 import { copy, getLocale, type Locale } from "@/lib/i18n";
+import { getFaqPath } from "@/lib/faqRoutes";
 import { getPublicLandingSeo } from "@/lib/seoApi";
 import {
   listarTourPackages,
@@ -121,7 +123,6 @@ const buildJsonLd = ({
   const language = locale === "es" ? "es-PE" : "en";
   const business = landingSeo?.business;
   const metadata = landingSeo?.metadata;
-  const faqs = landingSeo?.faqs || [];
   const organizationId = `${MAIN_SITE_URL}/#organization`;
   const websiteId = `${MAIN_SITE_URL}/#website`;
   const webpageId = `${localizedUrl}#webpage`;
@@ -270,29 +271,7 @@ const buildJsonLd = ({
         }
       : null;
 
-  const faqPage =
-    faqs.length > 0
-      ? {
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "@id": `${localizedUrl}#faq`,
-          url: `${localizedUrl}#faq`,
-          inLanguage: language,
-          isPartOf: {
-            "@id": webpageId,
-          },
-          mainEntity: faqs.map((faq) => ({
-            "@type": "Question",
-            name: faq.question,
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: faq.answer,
-            },
-          })),
-        }
-      : null;
-
-  return [organization, website, webPage, itemList, faqPage].filter(Boolean);
+  return [organization, website, webPage, itemList].filter(Boolean);
 };
 
 export const generateStaticParams = () => [{ locale: "en" }, { locale: "es" }];
@@ -386,7 +365,7 @@ const Home = async ({ params }: { params: Promise<{ locale: string }> }) => {
   ]);
 
   const jsonLd = buildJsonLd({ landingSeo, tours, locale });
-  const faqs = landingSeo?.faqs || [];
+  const hasFaqs = (landingSeo?.faqs || []).length > 0;
   const shareMessage = landingSeo?.metadata?.shareMessage || undefined;
 
   return (
@@ -402,38 +381,6 @@ const Home = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <HeroCarousel initialSlides={slides} locale={locale} />
 
       <TourPackagesGrid locale={locale} initialPackages={tours} />
-
-      {faqs.length > 0 ? (
-        <section
-          id="faq"
-          className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
-        >
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700 dark:text-emerald-400">
-              {t.faqEyebrow}
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-slate-950 dark:text-white sm:text-4xl">
-              {t.faqTitle}
-            </h2>
-          </div>
-
-          <div className="mx-auto mt-8 max-w-4xl space-y-4">
-            {faqs.map((faq) => (
-              <details
-                key={faq.id}
-                className="group rounded-3xl border border-emerald-900/10 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900"
-              >
-                <summary className="cursor-pointer list-none text-base font-black text-slate-950 marker:hidden dark:text-white">
-                  {faq.question}
-                </summary>
-                <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       <section
         id="contact"
@@ -461,6 +408,32 @@ const Home = async ({ params }: { params: Promise<{ locale: string }> }) => {
               message={shareMessage || t.defaultShareMessage}
               url={getLocalizedSiteUrl(locale)}
             />
+
+            {hasFaqs ? (
+              <section
+                className="rounded-4xl border border-emerald-900/10 bg-gradient-to-br from-emerald-950 to-lime-900 p-6 text-white shadow-xl shadow-emerald-950/10"
+                aria-labelledby="faq-cta-title"
+              >
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-100">
+                  {t.faqEyebrow}
+                </p>
+                <h2
+                  id="faq-cta-title"
+                  className="mt-3 text-2xl font-black tracking-tight sm:text-3xl"
+                >
+                  {t.faqCtaTitle}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-emerald-50/90 sm:text-base">
+                  {t.faqCtaDescription}
+                </p>
+                <Link
+                  href={getFaqPath(locale)}
+                  className="mt-5 inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-950 shadow-lg shadow-emerald-950/20 transition hover:bg-emerald-50"
+                >
+                  {t.faqCtaButton}
+                </Link>
+              </section>
+            ) : null}
           </div>
         </div>
       </section>

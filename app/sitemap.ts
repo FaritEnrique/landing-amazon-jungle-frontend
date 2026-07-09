@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getFaqLanguageAlternates } from "@/lib/faqRoutes";
 
 const FALLBACK_SITE_URL = "https://landing.amazonjungle-expeditions.com";
 
@@ -9,7 +10,7 @@ const getSiteUrl = () => {
   );
 };
 
-const getLanguageAlternates = (siteUrl: string) => ({
+const getHomeLanguageAlternates = (siteUrl: string) => ({
   en: `${siteUrl}/en`,
   "es-PE": `${siteUrl}/es`,
   "x-default": `${siteUrl}/en`,
@@ -18,8 +19,11 @@ const getLanguageAlternates = (siteUrl: string) => ({
 const sitemap = (): MetadataRoute.Sitemap => {
   const siteUrl = getSiteUrl();
   const lastModified = new Date();
-  const alternates = {
-    languages: getLanguageAlternates(siteUrl),
+  const homeAlternates = {
+    languages: getHomeLanguageAlternates(siteUrl),
+  };
+  const faqAlternates = {
+    languages: getFaqLanguageAlternates(siteUrl),
   };
 
   return [
@@ -28,14 +32,28 @@ const sitemap = (): MetadataRoute.Sitemap => {
       lastModified,
       changeFrequency: "weekly",
       priority: 1,
-      alternates,
+      alternates: homeAlternates,
     },
     {
       url: `${siteUrl}/es`,
       lastModified,
       changeFrequency: "weekly",
       priority: 0.8,
-      alternates,
+      alternates: homeAlternates,
+    },
+    {
+      url: `${siteUrl}/en/faqs`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.65,
+      alternates: faqAlternates,
+    },
+    {
+      url: `${siteUrl}/es/preguntas-frecuentes`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.65,
+      alternates: faqAlternates,
     },
   ];
 };

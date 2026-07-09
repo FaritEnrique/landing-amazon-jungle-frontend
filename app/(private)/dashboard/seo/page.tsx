@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import LocaleTabs from "@/app/components/admin/LocaleTabs";
+import MarkdownContent from "@/app/components/faqs/MarkdownContent";
 import { getMe } from "@/lib/authApi";
 import { LOCALES, localeLabels, type Locale } from "@/lib/i18n";
 import {
@@ -1343,8 +1344,9 @@ const SeoKeywordsPage = () => {
                     {localeLabels[activeLocale]}
                   </h2>
                   <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                    Se muestra en la landing y alimenta FAQPage JSON-LD por
-                    idioma.
+                    Se muestra en la página pública de preguntas frecuentes y
+                    alimenta FAQPage JSON-LD por idioma. En la landing se
+                    mostrará un acceso destacado hacia esa página.
                   </p>
                 </div>
 
@@ -1382,9 +1384,52 @@ const SeoKeywordsPage = () => {
                 onChange={(event) =>
                   setFaqTranslationField("answer", event.target.value)
                 }
-                rows={5}
+                rows={7}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 dark:border-slate-800 dark:bg-slate-950"
               />
+              <div className="mt-3 rounded-2xl border border-emerald-900/10 bg-emerald-50/70 p-4 text-xs leading-6 text-emerald-950 dark:border-emerald-300/10 dark:bg-emerald-950/30 dark:text-emerald-100">
+                <p className="font-black uppercase tracking-[0.16em]">
+                  Ayuda Markdown
+                </p>
+                <ul className="mt-2 list-disc space-y-1 pl-4">
+                  <li>
+                    Usa <strong>**negrita**</strong> para resaltar ideas clave.
+                  </li>
+                  <li>
+                    Usa listas con <strong>-</strong> para recomendaciones o
+                    requisitos.
+                  </li>
+                  <li>
+                    Usa enlaces como <strong>[texto](https://...)</strong>.
+                  </li>
+                  <li>
+                    Usa subtítulos con <strong>###</strong> cuando la respuesta
+                    necesite secciones.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
+                <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-800">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+                    Vista previa de la respuesta
+                  </p>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+                    {localeLabels[activeLocale]}
+                  </span>
+                </div>
+                {currentFaqTranslation.answer.trim() ? (
+                  <MarkdownContent
+                    content={currentFaqTranslation.answer}
+                    className="mt-4 text-xs sm:text-sm"
+                  />
+                ) : (
+                  <p className="mt-4 text-xs leading-6 text-slate-400">
+                    Escribe una respuesta para ver cómo se renderizará en la
+                    página pública.
+                  </p>
+                )}
+              </div>
 
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <label className="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
