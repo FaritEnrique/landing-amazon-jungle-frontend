@@ -134,7 +134,7 @@ const Header = () => {
                   alt="Amazon Jungle Expeditions Lodge"
                   fill
                   sizes="(max-width: 1024px) 56px, 80px"
-                  className="object-contain p-1"
+                  className="object-cover"
                   priority
                 />
               </div>
