@@ -148,7 +148,13 @@ const Header = () => {
                       : "text-emerald-950",
                   ].join(" ")}
                 >
+                  {/* <TextoContorno
+                    grosor={isOverlayHeader ? "0px" : "0.7px"}
+                    colorBorde="rgba(255,255,255,0.85)"
+                    className="font-extrabold"
+                  > */}
                   Amazon Jungle
+                  {/* </TextoContorno> */}
                 </p>
 
                 <p

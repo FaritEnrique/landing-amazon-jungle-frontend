@@ -53,6 +53,18 @@ const fallbackRemotePatterns: RemotePattern[] = [
   {
     protocol: "http",
     hostname: "localhost",
+    port: "4000",
+    pathname: "/**",
+  },
+  {
+    protocol: "http",
+    hostname: "127.0.0.1",
+    port: "4000",
+    pathname: "/**",
+  },
+  {
+    protocol: "http",
+    hostname: "localhost",
     port: "3001",
     pathname: "/**",
   },
@@ -69,6 +81,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [...configuredRemotePatterns, ...fallbackRemotePatterns],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
   },
 };
 

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { copy, type Locale } from "@/lib/i18n";
 import { resolveHeroImageUrl, type HeroSlide } from "@/lib/heroSlidesApi";
 import { trackEvent } from "@/lib/analytics";
+import TextoContorno from "./TextoContorno";
 
 const fallbackSlidesByLocale: Record<Locale, HeroSlide[]> = {
   en: [
@@ -207,14 +208,31 @@ const HeroCarousel = ({ initialSlides, locale = "en" }: HeroCarouselProps) => {
 
             {hasTitle && (
               <h1 className="font-sans text-4xl font-black leading-[1.04] tracking-tight text-slate-950 drop-shadow-xl sm:font-display sm:text-5xl md:text-6xl lg:text-7xl">
-                {titleBefore}
+                {titleBefore && (
+                  <TextoContorno grosor="1px" colorBorde="white" className="">
+                    {titleBefore}
+                  </TextoContorno>
+                )}
                 {titleHighlight && (
                   <>
                     {titleBefore && <br />}
-                    <span className="text-amber-400">{titleHighlight}</span>
+                    <TextoContorno
+                      grosor="1px"
+                      colorBorde="rgba(22, 101, 52, 0.9)"
+                      className="text-amber-400"
+                    >
+                      {titleHighlight}
+                    </TextoContorno>
                   </>
                 )}
-                {titleAfter && <> {titleAfter}</>}
+                {titleAfter && (
+                  <>
+                    <br />
+                    <TextoContorno grosor="1px" colorBorde="white" className="">
+                      {titleAfter}
+                    </TextoContorno>
+                  </>
+                )}
               </h1>
             )}
 
