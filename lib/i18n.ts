@@ -26,7 +26,7 @@ export const copy = {
     switchTo: "Español",
     faqEyebrow: "Frequently asked questions",
     faqTitle: "Plan your Amazon experience with confidence",
-    contactEyebrow: "Amazon Jungle Expeditions",
+    contactEyebrow: "Amazon Jungle Expeditions Lodge",
     contactTitle: "Experience the Amazon from Iquitos",
     contactDescription:
       "Discover the rainforest through guided excursions, authentic experiences, living nature and local hospitality from our jungle lodge.",
@@ -61,7 +61,7 @@ export const copy = {
     switchTo: "English",
     faqEyebrow: "Preguntas frecuentes",
     faqTitle: "Planifica tu experiencia amazónica con confianza",
-    contactEyebrow: "Amazon Jungle Expeditions",
+    contactEyebrow: "Amazon Jungle Expeditions Lodge",
     contactTitle: "Vive la Amazonía desde Iquitos",
     contactDescription:
       "Descubre la selva con excursiones guiadas, experiencias auténticas, naturaleza viva y hospitalidad local desde nuestro albergue amazónico.",
