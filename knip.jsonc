@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "lighthouserc.cjs"
+  ],
+  "project": [
+    "app/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "*.config.{js,cjs,mjs,ts}"
+  ],
+  "ignoreDependencies": [
+    "tailwindcss"
+  ]
+}

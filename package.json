@@ -6,10 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "doctor:react": "npx --yes react-doctor@latest --no-telemetry",
+    "audit:unused": "npx --yes knip@latest",
+    "audit:lighthouse": "npm run build && npx --yes @lhci/cli@latest autorun",
+    "audit:frontend": "npm run doctor:react && npm run audit:unused",
+    "audit:frontend:full": "npm run audit:frontend && npm run audit:lighthouse"
   },
   "dependencies": {
-    "lucide": "^1.23.0",
     "lucide-react": "^1.23.0",
     "next": "^16.2.9",
     "postcss": "^8.5.16",

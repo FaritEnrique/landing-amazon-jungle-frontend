@@ -1,5 +1,8 @@
 import type { Locale } from "@/lib/i18n";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const PUBLIC_SEO_REVALIDATE_SECONDS = 120;
+
+type NextFetchOptions = RequestInit & { next?: { revalidate?: number } };
 
 export type SeoImageTarget = "og" | "twitter";
 
@@ -148,10 +151,17 @@ const parseApiResponse = async <T>(response: Response): Promise<T> => {
   return data as T;
 };
 
-export const getPublicSeoMetadata = async (locale: Locale = "en") => {
+export const getPublicSeoMetadata = async (
+  locale: Locale = "en",
+  fetchOptions: NextFetchOptions = {},
+) => {
   const response = await fetch(`${API_URL}/api/seo/meta?locale=${locale}`, {
     method: "GET",
-    cache: "no-store",
+    cache: "force-cache",
+    next: {
+      revalidate: PUBLIC_SEO_REVALIDATE_SECONDS,
+    },
+    ...fetchOptions,
   });
 
   return parseApiResponse<{
@@ -160,10 +170,17 @@ export const getPublicSeoMetadata = async (locale: Locale = "en") => {
   }>(response);
 };
 
-export const getPublicLandingSeo = async (locale: Locale = "en") => {
+export const getPublicLandingSeo = async (
+  locale: Locale = "en",
+  fetchOptions: NextFetchOptions = {},
+) => {
   const response = await fetch(`${API_URL}/api/seo/landing?locale=${locale}`, {
     method: "GET",
-    cache: "no-store",
+    cache: "force-cache",
+    next: {
+      revalidate: PUBLIC_SEO_REVALIDATE_SECONDS,
+    },
+    ...fetchOptions,
   });
 
   return parseApiResponse<{

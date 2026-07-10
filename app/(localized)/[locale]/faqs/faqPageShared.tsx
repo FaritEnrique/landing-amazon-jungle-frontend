@@ -4,6 +4,7 @@ import { MessageCircle, ArrowLeft, HelpCircle } from "lucide-react";
 import MarkdownContent from "@/app/components/faqs/MarkdownContent";
 import { copy, type Locale } from "@/lib/i18n";
 import { getFaqLanguageAlternates, getFaqPath } from "@/lib/faqRoutes";
+import { getJsonLdKey, serializeJsonLd } from "@/lib/jsonLd";
 import { stripMarkdown } from "@/lib/markdown";
 import { getPublicLandingSeo, type SeoFaq } from "@/lib/seoApi";
 
@@ -207,11 +208,11 @@ const FaqPublicPage = async ({ locale }: FaqPublicPageProps) => {
 
   return (
     <main className="min-h-screen bg-stone-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-      {jsonLd.map((item, index) => (
+      {jsonLd.map((item) => (
         <script
-          key={index}
+          key={getJsonLdKey(item, "faq-jsonld")}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(item) }}
         />
       ))}
       <section className="relative overflow-hidden border-b border-emerald-900/10 bg-gradient-to-br from-emerald-950 via-emerald-900 to-lime-900 px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-20">

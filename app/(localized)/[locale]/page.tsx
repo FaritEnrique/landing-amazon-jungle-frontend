@@ -6,6 +6,7 @@ import TourPackagesGrid from "../../components/tours/TourPackagesGrid";
 import { listPublicHeroSlides } from "@/lib/heroSlidesApi";
 import { copy, getLocale, type Locale } from "@/lib/i18n";
 import { getFaqPath } from "@/lib/faqRoutes";
+import { getJsonLdKey, serializeJsonLd } from "@/lib/jsonLd";
 import { getPublicLandingSeo } from "@/lib/seoApi";
 import {
   listarTourPackages,
@@ -370,11 +371,11 @@ const Home = async ({ params }: { params: Promise<{ locale: string }> }) => {
 
   return (
     <div className="w-full bg-stone-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-      {jsonLd.map((item, index) => (
+      {jsonLd.map((item) => (
         <script
-          key={index}
+          key={getJsonLdKey(item, "home-jsonld")}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(item) }}
         />
       ))}
 

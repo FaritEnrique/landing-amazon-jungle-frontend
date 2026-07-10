@@ -33,6 +33,7 @@ const AnalyticsScripts = () => {
               height="0"
               width="0"
               title="Google Tag Manager"
+              sandbox=""
               style={{ display: "none", visibility: "hidden" }}
             />
           </noscript>

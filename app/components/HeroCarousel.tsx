@@ -177,7 +177,6 @@ const HeroCarousel = ({ initialSlides, locale = "en" }: HeroCarouselProps) => {
   return (
     <section
       className="relative isolate min-h-svh overflow-hidden bg-emerald-950 text-white"
-      role="region"
       aria-roledescription="carousel"
       aria-label={t.carouselLabel}
     >
