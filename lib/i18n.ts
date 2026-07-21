@@ -56,7 +56,7 @@ export const copy = {
     footerWriteToUs: "Write to us",
     footerSocialNetwork: "Social network",
     privacyPolicyText: "Privacy Policy",
-    privacyPolicyUrl: "https://www.amazonjungle-expeditions.com/politica-privacidad/",
+    privacyPolicyUrl: "https://www.amazonjungle-expeditions.com/privacy-policy/",
     facebookLabel: "Visit our Facebook page",
     instagramLabel: "Visit our Instagram profile",
     tiktokLabel: "Visit our TikTok profile",
