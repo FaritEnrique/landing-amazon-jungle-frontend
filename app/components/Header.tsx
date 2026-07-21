@@ -170,7 +170,7 @@ const Header = () => {
               </div>
             </Link>
 
-            {/* AcciÃ³n desktop */}
+            {/* Acción desktop */}
             <div className="hidden items-center gap-3 lg:flex">
               <Link
                 href={LANDING_SITE_URL}

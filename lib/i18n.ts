@@ -55,6 +55,8 @@ export const copy = {
     footerFindUs: "Find us",
     footerWriteToUs: "Write to us",
     footerSocialNetwork: "Social network",
+    privacyPolicyText: "Privacy Policy",
+    privacyPolicyUrl: "https://www.amazonjungle-expeditions.com/politica-privacidad/",
     facebookLabel: "Visit our Facebook page",
     instagramLabel: "Visit our Instagram profile",
     tiktokLabel: "Visit our TikTok profile",
@@ -94,6 +96,9 @@ export const copy = {
     footerFindUs: "Encuéntranos",
     footerWriteToUs: "Escríbenos",
     footerSocialNetwork: "Redes sociales",
+    privacyPolicyText: "Política de Privacidad",
+    privacyPolicyUrl:
+      "https://www.amazonjungle-expeditions.com/es/politica-de-privacidad-amazon-jungle-expeditions-lodge/",
     facebookLabel: "Visitar nuestro Facebook",
     instagramLabel: "Visitar nuestro Instagram",
     tiktokLabel: "Visitar nuestro TikTok",

@@ -110,8 +110,20 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="text-center text-[10px] text-white/30 mt-12 pt-4 border-t border-white/10 max-w-7xl mx-auto">
-        &copy; {new Date().getFullYear()} Amazon Jungle Expeditions Loges.
+      <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <p className="text-[10px] text-white/30 font-sans order-2 sm:order-1">
+          &copy; {new Date().getFullYear()} Amazon Jungle Expeditions Lodge. All
+          rights reserved.
+        </p>
+
+        <a
+          href={t.privacyPolicyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="order-1 sm:order-2 text-xs sm:text-sm font-medium tracking-wide text-amber-500 hover:text-white underline underline-offset-4 decoration-white/40 hover:decoration-white transition-all duration-200"
+        >
+          {t.privacyPolicyText}
+        </a>
       </div>
     </footer>
   );
