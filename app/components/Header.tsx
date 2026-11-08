@@ -76,7 +76,7 @@ const Header = () => {
             >
               <Phone size={15} />
               {locale === "es" ? "RESERVAR" : "BOOK"} (+51) 943214093 /
-              937069135 / 963736321
+              922700988
             </Link>
 
             <div className="flex items-center gap-4">
