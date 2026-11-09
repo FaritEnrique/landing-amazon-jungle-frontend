@@ -53,7 +53,11 @@ const Footer: React.FC = () => {
             <div className="flex items-center justify-center gap-2 mt-4 text-sm font-light text-zinc-200">
               <FaRegEnvelope className="text-base shrink-0" />
               <a
-                href="mailto:reservas@amazonjungle-expeditions.com"
+                href={
+                  locale === "es"
+                    ? "https://www.amazonjungle-expeditions.com/es/contacto/"
+                    : "https://www.amazonjungle-expeditions.com/contact/"
+                }
                 className="hover:underline break-all"
               >
                 reservas@amazonjungle-expeditions.com
