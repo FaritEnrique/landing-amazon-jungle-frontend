@@ -1,10 +1,11 @@
+import { requireRouteLocale } from "@/lib/routeLocale";
 import type { Metadata } from "next";
 import Link from "next/link";
 import HeroCarousel from "../../components/HeroCarousel";
 import ShareButtons from "../../components/ShareButtons";
 import TourPackagesGrid from "../../components/tours/TourPackagesGrid";
 import { listPublicHeroSlides } from "@/lib/heroSlidesApi";
-import { copy, getLocale, type Locale } from "@/lib/i18n";
+import { copy, type Locale } from "@/lib/i18n";
 import { getFaqPath } from "@/lib/faqRoutes";
 import { getJsonLdKey, serializeJsonLd } from "@/lib/jsonLd";
 import { getPublicLandingSeo } from "@/lib/seoApi";
@@ -283,7 +284,7 @@ export const generateMetadata = async ({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
   const { locale: rawLocale } = await params;
-  const locale = getLocale(rawLocale);
+  const locale = requireRouteLocale(rawLocale);
   const landingSeo = await getLandingSeo(locale);
   const metadata = landingSeo?.metadata;
   const localizedUrl = getLocalizedSiteUrl(locale);
@@ -357,7 +358,7 @@ export const generateMetadata = async ({
 
 const Home = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale: rawLocale } = await params;
-  const locale = getLocale(rawLocale);
+  const locale = requireRouteLocale(rawLocale);
   const t = copy[locale];
   const [slides, landingSeo, tours] = await Promise.all([
     getHeroSlides(locale),

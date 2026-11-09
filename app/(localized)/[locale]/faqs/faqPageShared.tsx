@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MessageCircle, ArrowLeft, HelpCircle } from "lucide-react";
+import { notFound } from "next/navigation";
+import { MessageCircle, ArrowLeft } from "lucide-react";
 import MarkdownContent from "@/app/components/faqs/MarkdownContent";
-import { copy, type Locale } from "@/lib/i18n";
+import { alternateLocale, copy, type Locale } from "@/lib/i18n";
 import { getFaqLanguageAlternates, getFaqPath } from "@/lib/faqRoutes";
 import { getJsonLdKey, serializeJsonLd } from "@/lib/jsonLd";
 import { stripMarkdown } from "@/lib/markdown";
@@ -41,13 +42,11 @@ const getFaqPageDescription = (locale: Locale) =>
     ? "Resuelve dudas sobre seguridad, clima, qué llevar, reservas, alojamiento y tours en la selva amazónica desde Iquitos, Perú."
     : "Find answers about safety, weather, what to pack, booking, lodge stays and Amazon rainforest tours from Iquitos, Peru.";
 
+// Treat an unavailable backend as an error, not as an empty FAQ list (404).
+// Next.js caches successful public SEO requests for 120 seconds.
 const getLandingSeo = async (locale: Locale) => {
-  try {
-    const response = await getPublicLandingSeo(locale);
-    return response.data;
-  } catch {
-    return null;
-  }
+  const response = await getPublicLandingSeo(locale);
+  return response.data;
 };
 
 const buildFaqJsonLd = ({
@@ -103,19 +102,26 @@ const buildFaqJsonLd = ({
 };
 
 export const buildFaqMetadata = async (locale: Locale): Promise<Metadata> => {
-  const landingSeo = await getLandingSeo(locale);
-  const metadata = landingSeo?.metadata;
+  const [landingSeo, alternateSeo] = await Promise.all([
+    getLandingSeo(locale),
+    getLandingSeo(alternateLocale(locale)),
+  ]);
+  const metadata = landingSeo.metadata;
   const faqUrl = `${SITE_URL}${getFaqPath(locale)}`;
   const title = getFaqPageTitle(locale);
   const description = getFaqPageDescription(locale);
   const image = resolveSocialImageUrl(metadata?.ogImageUrl);
+  const hasFaqs = landingSeo.faqs.length > 0;
+  const allowIndex = hasFaqs && (metadata?.robotsIndex ?? true);
 
   return {
     title,
     description,
     alternates: {
       canonical: faqUrl,
-      languages: getFaqLanguageAlternates(SITE_URL),
+      languages: alternateSeo.faqs.length > 0 && (alternateSeo.metadata.robotsIndex ?? true)
+        ? getFaqLanguageAlternates(SITE_URL)
+        : undefined,
     },
     openGraph: {
       title,
@@ -143,10 +149,10 @@ export const buildFaqMetadata = async (locale: Locale): Promise<Metadata> => {
       images: image ? [image] : undefined,
     },
     robots: {
-      index: metadata?.robotsIndex ?? true,
+      index: allowIndex,
       follow: metadata?.robotsFollow ?? true,
       googleBot: {
-        index: metadata?.robotsIndex ?? true,
+        index: allowIndex,
         follow: metadata?.robotsFollow ?? true,
         "max-image-preview": "large",
         "max-snippet": -1,
@@ -168,9 +174,6 @@ const getFaqIntro = (locale: Locale) => {
       whatsappText:
         "Escríbenos por WhatsApp y te ayudamos a elegir el tour ideal según tus días disponibles.",
       whatsappButton: "Hablar por WhatsApp",
-      emptyTitle: "Aún no hay preguntas frecuentes publicadas",
-      emptyText:
-        "Cuando el equipo publique nuevas preguntas desde el dashboard, aparecerán aquí automáticamente.",
       showAnswer: "Ver respuesta +",
       hideAnswer: "Ocultar respuesta −",
     };
@@ -186,9 +189,6 @@ const getFaqIntro = (locale: Locale) => {
     whatsappText:
       "Message us on WhatsApp and we will help you choose the right tour based on your available days.",
     whatsappButton: "Chat on WhatsApp",
-    emptyTitle: "No FAQs have been published yet",
-    emptyText:
-      "When the team publishes new questions from the dashboard, they will appear here automatically.",
     showAnswer: "View answer +",
     hideAnswer: "Hide answer −",
   };
@@ -200,7 +200,9 @@ interface FaqPublicPageProps {
 
 const FaqPublicPage = async ({ locale }: FaqPublicPageProps) => {
   const landingSeo = await getLandingSeo(locale);
-  const faqs = landingSeo?.faqs || [];
+  const faqs = landingSeo.faqs;
+  // A public FAQ page only exists while its owner has published FAQ entries.
+  if (faqs.length === 0) notFound();
   const text = getFaqIntro(locale);
   const t = copy[locale];
   const jsonLd = buildFaqJsonLd({ faqs, locale });
@@ -242,40 +244,27 @@ const FaqPublicPage = async ({ locale }: FaqPublicPageProps) => {
 
       <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-8 lg:py-16">
         <div className="rounded-[2rem] border border-emerald-900/10 bg-white p-4 shadow-xl shadow-emerald-950/5 dark:border-white/10 dark:bg-slate-900 sm:p-6 lg:p-8">
-          {faqs.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center dark:border-slate-700">
-              <HelpCircle className="mx-auto h-10 w-10 text-emerald-700 dark:text-emerald-300" />
-              <h2 className="mt-4 text-xl font-black text-slate-950 dark:text-white">
-                {text.emptyTitle}
-              </h2>
-              <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600 dark:text-slate-300">
-                {text.emptyText}
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-200 dark:divide-slate-800">
-              {faqs.map((faq, index) => (
-                <details key={faq.id} className="group py-5 first:pt-0 last:pb-0">
-                  <summary className="grid cursor-pointer list-none gap-4 marker:hidden sm:grid-cols-[72px_minmax(0,1fr)_auto] sm:items-center">
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-sm font-black text-emerald-900 ring-1 ring-emerald-900/10 dark:bg-emerald-950 dark:text-emerald-100 dark:ring-white/10 sm:h-14 sm:w-14">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-base font-black leading-7 text-slate-950 transition group-hover:text-emerald-900 dark:text-white dark:group-hover:text-emerald-200 sm:text-lg">
-                      {faq.question}
-                    </span>
-                    <span className="inline-flex w-fit items-center justify-center rounded-full border border-emerald-900/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-emerald-900 transition group-hover:bg-emerald-900 group-hover:text-white dark:border-white/10 dark:text-emerald-200 dark:group-hover:bg-emerald-300 dark:group-hover:text-emerald-950">
-                      <span className="group-open:hidden">{text.showAnswer}</span>
-                      <span className="hidden group-open:inline">{text.hideAnswer}</span>
-                    </span>
-                  </summary>
-
-                  <div className="mt-5 rounded-3xl bg-slate-50 p-5 dark:bg-slate-950 sm:ml-[72px] sm:p-6">
-                    <MarkdownContent content={faq.answer} />
-                  </div>
-                </details>
-              ))}
-            </div>
-          )}
+          <div className="divide-y divide-slate-200 dark:divide-slate-800">
+            {faqs.map((faq, index) => (
+              <details key={faq.id} className="group py-5 first:pt-0 last:pb-0">
+                <summary className="grid cursor-pointer list-none gap-4 marker:hidden sm:grid-cols-[72px_minmax(0,1fr)_auto] sm:items-center">
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-sm font-black text-emerald-900 ring-1 ring-emerald-900/10 dark:bg-emerald-950 dark:text-emerald-100 dark:ring-white/10 sm:h-14 sm:w-14">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-base font-black leading-7 text-slate-950 transition group-hover:text-emerald-900 dark:text-white dark:group-hover:text-emerald-200 sm:text-lg">
+                    {faq.question}
+                  </span>
+                  <span className="inline-flex w-fit items-center justify-center rounded-full border border-emerald-900/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-emerald-900 transition group-hover:bg-emerald-900 group-hover:text-white dark:border-white/10 dark:text-emerald-200 dark:group-hover:text-emerald-950">
+                    <span className="group-open:hidden">{text.showAnswer}</span>
+                    <span className="hidden group-open:inline">{text.hideAnswer}</span>
+                  </span>
+                </summary>
+                <div className="mt-5 rounded-3xl bg-slate-50 p-5 dark:bg-slate-950 sm:ml-[72px] sm:p-6">
+                  <MarkdownContent content={faq.answer} />
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
 
         <aside className="h-fit rounded-[2rem] border border-emerald-900/10 bg-gradient-to-br from-white to-emerald-50 p-6 shadow-xl shadow-emerald-950/5 dark:border-white/10 dark:from-slate-900 dark:to-emerald-950/30 lg:sticky lg:top-32">
