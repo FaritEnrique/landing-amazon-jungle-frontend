@@ -31,12 +31,20 @@ const Header = () => {
   const landingLabel =
     locale === "es" ? "Ir a la pÃ¡gina landing" : "Go to landing home";
 
-  const handleWhatsAppClick = (source: string) => {
+  const bookingMessage =
+    locale === "es"
+      ? "Hola, quisiera recibir información para reservar una experiencia con Amazon Jungle Expeditions."
+      : "Hello, I would like information about booking an Amazon experience with Amazon Jungle Expeditions.";
+
+  const bookingWhatsAppUrl = (number: string) =>
+    `https://wa.me/${number}?text=${encodeURIComponent(bookingMessage)}`;
+
+  const handleWhatsAppClick = (source: string, number: string) => {
     trackEvent("click_whatsapp", {
       source,
       locale,
       page_path: pathname || "/",
-      destination_url: "https://wa.me/51943214093",
+      destination_url: bookingWhatsAppUrl(number),
     });
   };
 
@@ -67,17 +75,31 @@ const Header = () => {
           ].join(" ")}
         >
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2 text-xs font-bold">
-            <Link
-              href="https://wa.me/51943214093"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 tracking-wide text-emerald-50 transition hover:text-white"
-              onClick={() => handleWhatsAppClick("header_desktop")}
-            >
-              <Phone size={15} />
-              {locale === "es" ? "RESERVAR" : "BOOK"} (+51) 943214093 /
-              922700988
-            </Link>
+            <div className="flex items-center gap-2 tracking-wide text-emerald-50">
+              <Phone size={15} aria-hidden="true" />
+              <span>{locale === "es" ? "RESERVAR" : "BOOK"}</span>
+              <a
+                href={bookingWhatsAppUrl("51943214093")}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${locale === "es" ? "Reservar por WhatsApp al" : "Book via WhatsApp at"} +51 943214093`}
+                className="transition hover:text-white hover:underline focus-visible:underline"
+                onClick={() => handleWhatsAppClick("header_desktop", "51943214093")}
+              >
+                (+51) 943214093
+              </a>
+              <span aria-hidden="true">/</span>
+              <a
+                href={bookingWhatsAppUrl("51922700988")}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${locale === "es" ? "Reservar por WhatsApp al" : "Book via WhatsApp at"} +51 922700988`}
+                className="transition hover:text-white hover:underline focus-visible:underline"
+                onClick={() => handleWhatsAppClick("header_desktop", "51922700988")}
+              >
+                922700988
+              </a>
+            </div>
 
             <div className="flex items-center gap-4">
               <Link
@@ -230,18 +252,21 @@ const Header = () => {
                   {locale === "es" ? "Landing" : "Home"}
                 </Link>
 
-                <Link
-                  href="https://wa.me/51943214093"
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => {
-                    handleWhatsAppClick("header_mobile");
-                    setIsMenuOpen(false);
-                  }}
-                  className="rounded-xl px-4 py-3 text-emerald-700 transition hover:bg-emerald-50"
-                >
-                  {t.reserveWhatsapp}
-                </Link>
+                {(["51943214093", "51922700988"] as const).map((number) => (
+                  <a
+                    key={number}
+                    href={bookingWhatsAppUrl(number)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      handleWhatsAppClick("header_mobile", number);
+                      setIsMenuOpen(false);
+                    }}
+                    className="rounded-xl px-4 py-3 text-emerald-700 transition hover:bg-emerald-50"
+                  >
+                    {t.reserveWhatsapp}: +51 {number.slice(2)}
+                  </a>
+                ))}
 
                 <Link
                   href="https://www.instagram.com/aldofloreshidalgo123"
