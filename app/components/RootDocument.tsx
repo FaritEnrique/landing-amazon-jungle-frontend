@@ -11,6 +11,7 @@ import AppToaster from "./AppToaster";
 import LanguageSwitcher from "./LanguageSwitcher";
 import HtmlLangSync from "./HtmlLangSync";
 import AnalyticsScripts from "./AnalyticsScripts";
+import FloatingWhatsApp from "./FloatingWhatsApp";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -59,6 +60,7 @@ const RootDocument = ({ children, lang }: RootDocumentProps) => {
         <main className="grow w-full">{children}</main>
 
         <Footer />
+        <FloatingWhatsApp />
         <LanguageSwitcher />
       </body>
     </html>

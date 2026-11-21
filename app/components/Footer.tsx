@@ -12,11 +12,27 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { copy, getLocale } from "@/lib/i18n";
+import { trackEvent } from "@/lib/analytics";
 
 const Footer: React.FC = () => {
   const pathname = usePathname();
   const locale = getLocale(pathname.split("/").filter(Boolean)[0]);
   const t = copy[locale];
+  const bookingMessage =
+    locale === "es"
+      ? "Hola, quisiera recibir información para reservar una experiencia con Amazon Jungle Expeditions."
+      : "Hello, I would like information about booking an Amazon experience with Amazon Jungle Expeditions.";
+  const bookingWhatsAppUrl = (number: string) =>
+    `https://wa.me/${number}?text=${encodeURIComponent(bookingMessage)}`;
+
+  const handleWhatsAppClick = (number: string) => {
+    trackEvent("click_whatsapp", {
+      source: "footer",
+      locale,
+      page_path: pathname || "/",
+      destination_url: bookingWhatsAppUrl(number),
+    });
+  };
 
   return (
     <footer className="w-full bg-[#465c12] text-white py-12 px-6 sm:px-12 md:px-24 mt-auto transition-colors duration-300 font-sans select-none relative">
@@ -28,7 +44,27 @@ const Footer: React.FC = () => {
             </h3>
             <div className="flex items-center justify-center gap-2 mt-4 text-sm font-light text-zinc-200">
               <FaWhatsapp className="text-base shrink-0" />
-              <span>+51 943214093 / 922700988</span>
+              <a
+                href={bookingWhatsAppUrl("51943214093")}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${locale === "es" ? "Reservar por WhatsApp al" : "Book via WhatsApp at"} +51 943214093`}
+                className="hover:text-white hover:underline"
+                onClick={() => handleWhatsAppClick("51943214093")}
+              >
+                +51 943214093
+              </a>
+              <span aria-hidden="true">/</span>
+              <a
+                href={bookingWhatsAppUrl("51922700988")}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${locale === "es" ? "Reservar por WhatsApp al" : "Book via WhatsApp at"} +51 922700988`}
+                className="hover:text-white hover:underline"
+                onClick={() => handleWhatsAppClick("51922700988")}
+              >
+                922700988
+              </a>
             </div>
           </div>
         </div>
